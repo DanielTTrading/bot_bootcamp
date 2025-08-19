@@ -73,7 +73,7 @@ def esta_en_prelanzamiento() -> tuple[bool, str]:
     if now < habilita_dt:
         dias = (habilita_dt.date() - now.date()).days
         msg = (
-            f"✨ El bot estará disponible 🔥 {PRELAUNCH_DAYS} días antes del evento.\n"
+            f"✨ El bot estará disponible 🔥 {PRELAUNCH_DAYS} días antes del evento.\n\n"
             f"⏳ Faltan {dias} días, vuelve pronto. 🙌\n\n"
             f"{PRELAUNCH_MESSAGE}"
         )
