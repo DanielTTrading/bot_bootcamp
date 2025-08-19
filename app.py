@@ -44,8 +44,8 @@ LAUNCH_DATE_STR = os.getenv("LAUNCH_DATE", "")         # 'YYYY-MM-DD'
 PRELAUNCH_DAYS = int(os.getenv("PRELAUNCH_DAYS", "2"))
 PRELAUNCH_MESSAGE = os.getenv(
     "PRELAUNCH_MESSAGE",
-    "🛠️ El bot entrará en funcionamiento completo 2 días antes del evento. "
-    "Vuelve más adelante y usa /start."
+    "✨ El bot estará disponible 🔥 2 días antes del evento."
+    "⏳ Vuelve pronto y usa /start para comenzar. 🙌"
 )
 
 def parse_fecha(date_str: str) -> datetime | None:
