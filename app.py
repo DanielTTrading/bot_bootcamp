@@ -109,25 +109,60 @@ AGENDA_PDF = DATA_DIR / "agenda.pdf"   # Si no existe, se enviará texto
 VIDEOS_DIR = DATA_DIR / "videos"
 DOCS_DIR = DATA_DIR / "docs"
 
-# Catálogos de materiales
-VIDEOS: Dict[str, Path] = {
-    "Video demo": VIDEOS_DIR / "TACTICAL TRADING 20 s.mov",   # .mov o .mp4
+# =========================
+# PRESENTADORES
+# =========================
+# IDs cortos para callback_data
+PRESENTADORES = [
+    ("p1", "Juan Pablo Vieira"),
+    ("p2", "Juan José Puerta"),
+    ("p3", "Carlos Andrés Pérez"),
+    ("p4", "Jorge Mario Rubio"),
+    ("p5", "Jair Viana"),
+]
+
+# ==== Materiales por presentador (rellena cuando tengas archivos) ====
+# Estructura:
+# MATERIALES[pID] = {
+#   "videos": { "Título": Path(...), ... },
+#   "docs":   { "Título": Path(...), ... },
+# }
+MATERIALES: Dict[str, Dict[str, Dict[str, Path]]] = {
+    "p1": {"videos": {}, "docs": {}},
+    "p2": {"videos": {}, "docs": {}},
+    "p3": {"videos": {}, "docs": {}},
+    "p4": {"videos": {}, "docs": {}},
+    "p5": {"videos": {}, "docs": {}},
 }
-DOCUMENTOS: Dict[str, Path] = {
-    "Documento PDF": DOCS_DIR / "RECOMENDACIONES LIZBETH CAROLINA VALVERDE CHILANGUAY.pdf",
-    "Hoja Excel (CSV)": DOCS_DIR / "contactos_limpios_week.csv",
-    "Documento Word": DOCS_DIR / "Proyecto de práctica.docx",
+# Ejemplo futuro:
+# MATERIALES["p2"]["docs"]["Guía de setup"] = DOCS_DIR / "guia_setup.pdf"
+# MATERIALES["p2"]["videos"]["Intro a la estrategia"] = VIDEOS_DIR / "intro.mp4"
+
+# ==== Enlaces de interés por presentador ====
+# ENLACES_POR_PRESENTADOR[pID] = { "Nombre del enlace": "https://..." }
+ENLACES_POR_PRESENTADOR: Dict[str, Dict[str, str]] = {
+    "p1": {},
+    "p2": {},
+    "p3": {},
+    "p4": {},
+    "p5": {},
+}
+# Ejemplo futuro:
+# ENLACES_POR_PRESENTADOR["p3"]["Hoja de cálculo en vivo"] = "https://..."
+
+# ==== Enlaces de conexión (generales) ====
+ENLACES_CONEXION: Dict[str, str] = {
+    # Rellena cuando los tengas:
+    # "Conexión Sala Principal": "https://example.com/sala-principal",
+    # "Conexión Sala Alterna": "https://example.com/sala-alterna",
 }
 
-# Enlaces
+# Enlaces de interés (generales, si quieres mantenerlos además de los por presentador)
 ENLACES_INTERES: Dict[str, str] = {
     "Página JP Tactical Trading": "https://ttrading.co",
     "Canal YouTube": "https://www.youtube.com/@JPTacticalTrading",
 }
-ENLACES_CONEXION: Dict[str, str] = {
-    "Conexión Sala Principal": "https://example.com/sala-principal",
-    "Conexión Sala Alterna": "https://example.com/sala-alterna",
-}
+
 UBICACION_URL = "https://maps.app.goo.gl/zZfR7kPo9ZR1AUtu9"
 
 # =========================
@@ -142,39 +177,51 @@ def principal_inline() -> InlineKeyboardMarkup:
         [InlineKeyboardButton("📍 Ubicación", callback_data="menu_ubicacion")],
     ])
 
-def material_inline() -> InlineKeyboardMarkup:
+def presentadores_keyboard(prefix: str) -> InlineKeyboardMarkup:
+    # prefix: "mat_pres" (material) o "link_pres" (enlaces)
+    rows = []
+    for pid, nombre in PRESENTADORES:
+        rows.append([InlineKeyboardButton(nombre, callback_data=f"{prefix}:{pid}")])
+    rows.append([InlineKeyboardButton("⬅️ Volver", callback_data="volver_menu_principal")])
+    return InlineKeyboardMarkup(rows)
+
+def material_presentador_menu(pid: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup([
-        [InlineKeyboardButton("🎬 Videos de interés", callback_data="material_videos")],
-        [InlineKeyboardButton("📄 Documentos", callback_data="material_documentos")],
-        [InlineKeyboardButton("⬅️ Volver", callback_data="volver_menu_principal")],
+        [InlineKeyboardButton("🎬 Videos", callback_data=f"mat_videos:{pid}")],
+        [InlineKeyboardButton("📄 Documentos", callback_data=f"mat_docs:{pid}")],
+        [InlineKeyboardButton("⬅️ Elegir otro presentador", callback_data="menu_material")],
+        [InlineKeyboardButton("🏠 Menú principal", callback_data="volver_menu_principal")],
     ])
 
-def enlaces_inline() -> InlineKeyboardMarkup:
+def lista_archivos_inline(diccionario: Dict[str, Path], prefix: str, pid: str) -> InlineKeyboardMarkup:
+    # prefix: "video" o "doc"
+    rows = []
+    for nombre in diccionario.keys():
+        rows.append([InlineKeyboardButton(nombre, callback_data=f"{prefix}:{pid}:{nombre}")])
+    rows.append([InlineKeyboardButton("⬅️ Volver", callback_data=f"mat_pres:{pid}")])
+    return InlineKeyboardMarkup(rows)
+
+def enlaces_inline_general() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup([
-        [InlineKeyboardButton("⭐ Enlaces de interés", callback_data="enlaces_interes")],
+        [InlineKeyboardButton("⭐ Enlaces por presentador", callback_data="enlaces_por_presentador")],
         [InlineKeyboardButton("🧩 Conexión al evento", callback_data="enlaces_conexion")],
         [InlineKeyboardButton("⬅️ Volver", callback_data="volver_menu_principal")],
     ])
+
+def enlaces_presentador_lista(pid: str) -> InlineKeyboardMarkup:
+    enlaces = ENLACES_POR_PRESENTADOR.get(pid, {})
+    rows = []
+    for nombre, url in enlaces.items():
+        rows.append([InlineKeyboardButton(nombre, url=url)])
+    rows.append([InlineKeyboardButton("⬅️ Elegir otro presentador", callback_data="enlaces_por_presentador")])
+    rows.append([InlineKeyboardButton("🏠 Menú principal", callback_data="volver_menu_principal")])
+    return InlineKeyboardMarkup(rows)
 
 def ubicacion_inline() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup([
         [InlineKeyboardButton("📍 Abrir en Google Maps", url=UBICACION_URL)],
         [InlineKeyboardButton("⬅️ Volver", callback_data="volver_menu_principal")],
     ])
-
-def lista_archivos_inline(diccionario: Dict[str, Path], prefix: str) -> InlineKeyboardMarkup:
-    rows = []
-    for nombre, _ in diccionario.items():
-        rows.append([InlineKeyboardButton(nombre, callback_data=f"{prefix}:{nombre}")])
-    rows.append([InlineKeyboardButton("⬅️ Volver", callback_data="menu_material")])
-    return InlineKeyboardMarkup(rows)
-
-def lista_enlaces_inline(diccionario: Dict[str, str]) -> InlineKeyboardMarkup:
-    rows = []
-    for nombre, url in diccionario.items():
-        rows.append([InlineKeyboardButton(nombre, url=url)])
-    rows.append([InlineKeyboardButton("⬅️ Volver", callback_data="menu_enlaces")])
-    return InlineKeyboardMarkup(rows)
 
 # Reply keyboard (persistente)
 BTN_AGENDA = "📅 Agenda"
@@ -336,10 +383,16 @@ async def text_ingreso_o_menu(update: Update, context: ContextTypes.DEFAULT_TYPE
             await accion_agenda(update, context)
             return
         if texto == BTN_MATERIAL:
-            await update.message.reply_text("📚 *Material de apoyo*", reply_markup=material_inline(), parse_mode="Markdown")
+            # Mostrar lista de presentadores para Material
+            await update.message.reply_text("📚 *Material de apoyo*\nElige un presentador:",
+                                            reply_markup=presentadores_keyboard("mat_pres"),
+                                            parse_mode="Markdown")
             return
         if texto == BTN_ENLACES:
-            await update.message.reply_text("🔗 *Enlaces y Conexión*", reply_markup=enlaces_inline(), parse_mode="Markdown")
+            # Menú general de enlaces: por presentador o conexiones
+            await update.message.reply_text("🔗 *Enlaces y Conexión*",
+                                            reply_markup=enlaces_inline_general(),
+                                            parse_mode="Markdown")
             return
         if texto == BTN_UBICACION:
             await accion_ubicacion(update, context)
@@ -362,7 +415,7 @@ async def text_ingreso_o_menu(update: Update, context: ContextTypes.DEFAULT_TYPE
         PERFILES[user_id] = PerfilUsuario(nombre=nombre, autenticado=True)
         primer_nombre = nombre.split()[0]
         await update.message.reply_text(
-            f"¡Hola, {primer_nombre}! 😊\n{BIENVENIDA}".replace("}}", "}"),  # evita typo accidental de doble llave
+            f"¡Hola, {primer_nombre}! 😊\n{BIENVENIDA}".replace("}}", "}"),
             reply_markup=bottom_keyboard()
         )
         await update.message.reply_text("Menú principal:", reply_markup=principal_inline())
@@ -455,46 +508,79 @@ async def menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     data = query.data
 
+    # Volver al menú principal
     if data == "volver_menu_principal":
         await query.edit_message_text("Menú principal:", reply_markup=principal_inline())
         return
 
+    # ====== AGENDA ======
     if data == "menu_agenda":
         await accion_agenda(query, context)
         return
 
+    # ====== MATERIAL POR PRESENTADOR ======
     if data == "menu_material":
-        await query.edit_message_text("📚 *Material de apoyo*", reply_markup=material_inline(), parse_mode="Markdown")
+        await query.edit_message_text("📚 *Material de apoyo*\nElige un presentador:",
+                                      reply_markup=presentadores_keyboard("mat_pres"),
+                                      parse_mode="Markdown")
         return
 
-    if data == "material_videos":
-        if not VIDEOS:
-            await query.edit_message_text("No hay videos disponibles por el momento.", reply_markup=material_inline())
+    if data.startswith("mat_pres:"):
+        pid = data.split(":", 1)[1]
+        nombre = next((n for (i, n) in PRESENTADORES if i == pid), "Presentador")
+        await query.edit_message_text(f"📚 *Material de {nombre}*",
+                                      reply_markup=material_presentador_menu(pid),
+                                      parse_mode="Markdown")
+        return
+
+    if data.startswith("mat_videos:"):
+        pid = data.split(":", 1)[1]
+        videos = MATERIALES.get(pid, {}).get("videos", {})
+        if not videos:
+            await query.edit_message_text("🎬 No hay videos disponibles por ahora.",
+                                          reply_markup=material_presentador_menu(pid))
         else:
-            await query.edit_message_text("🎬 *Videos de interés*:", reply_markup=lista_archivos_inline(VIDEOS, "video"), parse_mode="Markdown")
+            await query.edit_message_text("🎬 *Videos:*",
+                                          reply_markup=lista_archivos_inline(videos, "video", pid),
+                                          parse_mode="Markdown")
         return
 
-    if data == "material_documentos":
-        if not DOCUMENTOS:
-            await query.edit_message_text("No hay documentos disponibles por el momento.", reply_markup=material_inline())
+    if data.startswith("mat_docs:"):
+        pid = data.split(":", 1)[1]
+        docs = MATERIALES.get(pid, {}).get("docs", {})
+        if not docs:
+            await query.edit_message_text("📄 No hay documentos disponibles por ahora.",
+                                          reply_markup=material_presentador_menu(pid))
         else:
-            await query.edit_message_text("📄 *Documentos*:", reply_markup=lista_archivos_inline(DOCUMENTOS, "doc"), parse_mode="Markdown")
+            await query.edit_message_text("📄 *Documentos:*",
+                                          reply_markup=lista_archivos_inline(docs, "doc", pid),
+                                          parse_mode="Markdown")
         return
 
+    # ====== ENLACES ======
     if data == "menu_enlaces":
-        await query.edit_message_text("🔗 *Enlaces y Conexión*", reply_markup=enlaces_inline(), parse_mode="Markdown")
+        await query.edit_message_text("🔗 *Enlaces y Conexión*",
+                                      reply_markup=enlaces_inline_general(),
+                                      parse_mode="Markdown")
         return
 
-    if data == "menu_ubicacion":
-        await accion_ubicacion(query, context)
+    if data == "enlaces_por_presentador":
+        await query.edit_message_text("⭐ Elige un presentador:",
+                                      reply_markup=presentadores_keyboard("link_pres"))
         return
 
-    if data == "enlaces_interes":
-        if not ENLACES_INTERES:
-            await query.edit_message_text("No hay enlaces de interés disponibles por ahora.", reply_markup=enlaces_inline())
+    if data.startswith("link_pres:"):
+        pid = data.split(":", 1)[1]
+        nombre = next((n for (i, n) in PRESENTADORES if i == pid), "Presentador")
+        enlaces = ENLACES_POR_PRESENTADOR.get(pid, {})
+        if not enlaces:
+            await query.edit_message_text(f"⭐ *Enlaces de {nombre}*\n(No hay enlaces por ahora.)",
+                                          reply_markup=enlaces_presentador_lista(pid),
+                                          parse_mode="Markdown")
         else:
-            await query.edit_message_text("⭐ Enlaces de interés:", reply_markup=lista_enlaces_inline(ENLACES_INTERES))
-        await query.message.reply_text("Menú principal:", reply_markup=principal_inline())
+            await query.edit_message_text(f"⭐ *Enlaces de {nombre}*:",
+                                          reply_markup=enlaces_presentador_lista(pid),
+                                          parse_mode="Markdown")
         return
 
     if data == "enlaces_conexion":
@@ -502,24 +588,35 @@ async def menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not ENLACES_CONEXION:
             await query.edit_message_text(texto + "\n\nNo hay enlaces de conexión todavía.", parse_mode="Markdown")
         else:
-            await query.edit_message_text(texto, reply_markup=lista_enlaces_inline(ENLACES_CONEXION), parse_mode="Markdown")
-        await query.message.reply_text("Menú principal:", reply_markup=principal_inline())
+            # Lista de enlaces de conexión en botones URL
+            rows = [[InlineKeyboardButton(nombre, url=url)] for nombre, url in ENLACES_CONEXION.items()]
+            rows.append([InlineKeyboardButton("⬅️ Volver", callback_data="menu_enlaces")])
+            await query.edit_message_text("🧩 Conexiones del evento:",
+                                          reply_markup=InlineKeyboardMarkup(rows))
         return
 
+    # ====== UBICACIÓN ======
+    if data == "menu_ubicacion":
+        await accion_ubicacion(query, context)
+        return
+
+    # ====== Descargas concretas (videos/documentos) ======
     if data.startswith("video:"):
-        nombre = data.split(":", 1)[1]
-        ruta = VIDEOS.get(nombre)
+        # formato: video:<pid>:<titulo>
+        _, pid, titulo = data.split(":", 2)
+        ruta = MATERIALES.get(pid, {}).get("videos", {}).get(titulo)
         if ruta:
-            await envia_documento(update, context, ruta, nombre)
+            await envia_documento(update, context, ruta, titulo)
         else:
             await query.message.reply_text("No se encontró el video solicitado.")
         return
 
     if data.startswith("doc:"):
-        nombre = data.split(":", 1)[1]
-        ruta = DOCUMENTOS.get(nombre)
+        # formato: doc:<pid>:<titulo>
+        _, pid, titulo = data.split(":", 2)
+        ruta = MATERIALES.get(pid, {}).get("docs", {}).get(titulo)
         if ruta:
-            await envia_documento(update, context, ruta, nombre)
+            await envia_documento(update, context, ruta, titulo)
         else:
             await query.message.reply_text("No se encontró el documento solicitado.")
         return
