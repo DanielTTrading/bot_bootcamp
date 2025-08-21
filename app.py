@@ -44,7 +44,7 @@ LAUNCH_DATE_STR = os.getenv("LAUNCH_DATE", "")         # 'YYYY-MM-DD'
 PRELAUNCH_DAYS = int(os.getenv("PRELAUNCH_DAYS", "2"))
 PRELAUNCH_MESSAGE = os.getenv(
     "PRELAUNCH_MESSAGE",
-    "✨ El bot estará disponible 🔥 2 días antes del evento."
+    "✨ El bot estará disponible 🔥 el día del evento."
     "⏳ Vuelve pronto y usa /start para comenzar. 🙌"
 )
 
