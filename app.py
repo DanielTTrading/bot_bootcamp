@@ -73,7 +73,7 @@ def esta_en_prelanzamiento() -> tuple[bool, str]:
     if now < habilita_dt:
         dias = (habilita_dt.date() - now.date()).days
         msg = (
-            f"✨ El bot estará disponible 🔥 día del evento.\n\n"
+            f"✨ El bot estará disponible 🔥 el día del evento.\n\n"
             f"⏳ Faltan {dias} días, vuelve pronto. 🙌\n\n"
             f"{PRELAUNCH_MESSAGE}"
         )
@@ -225,7 +225,7 @@ UBICACION_URL = "https://maps.app.goo.gl/zZfR7kPo9ZR1AUtu9"
 
 # ==== Exness (nuevo) ====
 EXNESS_ACCOUNT_URL = "https://one.exnesstrack.org/a/s3wj0b5qry"
-EXNESS_COPY_URL = "https://social-trading.club/strategy/110447765/a/s3wj0b5qry?sharer=trader"
+EXNESS_COPY_URL = "https://social-trading.exness.com/strategy/227834645/a/s3wj0b5qry?sharer=trader"
 
 # =========================
 # MENÚS
