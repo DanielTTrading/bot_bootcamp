@@ -192,11 +192,6 @@ PRESENTADORES = [
 ]
 
 # ==== Materiales por presentador (rellena cuando tengas archivos) ====
-# Estructura:
-# MATERIALES[pID] = {
-#   "videos": { "Título": Path(...), ... },
-#   "docs":   { "Título": Path(...), ... },
-# }
 MATERIALES: Dict[str, Dict[str, Dict[str, Path]]] = {
     "p1": {"videos": {}, "docs": {}},
     "p2": {"videos": {}, "docs": {}},
@@ -204,12 +199,8 @@ MATERIALES: Dict[str, Dict[str, Dict[str, Path]]] = {
     "p4": {"videos": {}, "docs": {}},
     "p5": {"videos": {}, "docs": {}},
 }
-# Ejemplo futuro:
-# MATERIALES["p2"]["docs"]["Guía de setup"] = DOCS_DIR / "guia_setup.pdf"
-# MATERIALES["p2"]["videos"]["Intro a la estrategia"] = VIDEOS_DIR / "intro.mp4"
 
 # ==== Enlaces de interés por presentador ====
-# ENLACES_POR_PRESENTADOR[pID] = { "Nombre del enlace": "https://..." }
 ENLACES_POR_PRESENTADOR: Dict[str, Dict[str, str]] = {
     "p1": {},
     "p2": {},
@@ -217,23 +208,24 @@ ENLACES_POR_PRESENTADOR: Dict[str, Dict[str, str]] = {
     "p4": {},
     "p5": {},
 }
-# Ejemplo futuro:
-# ENLACES_POR_PRESENTADOR["p3"]["Hoja de cálculo en vivo"] = "https://..."
 
 # ==== Enlaces de conexión (generales) ====
 ENLACES_CONEXION: Dict[str, str] = {
-    # Rellena cuando los tengas:
     # "Conexión Sala Principal": "https://example.com/sala-principal",
     # "Conexión Sala Alterna": "https://example.com/sala-alterna",
 }
 
-# Enlaces de interés (generales, si quieres mantenerlos además de los por presentador)
+# Enlaces de interés (generales)
 ENLACES_INTERES: Dict[str, str] = {
     "Página JP Tactical Trading": "https://ttrading.co",
     "Canal YouTube": "https://www.youtube.com/@JPTacticalTrading",
 }
 
 UBICACION_URL = "https://maps.app.goo.gl/zZfR7kPo9ZR1AUtu9"
+
+# ==== Exness (nuevo) ====
+EXNESS_ACCOUNT_URL = "https://one.exnesstrack.org/a/s3wj0b5qry"
+EXNESS_COPY_URL = "https://social-trading.club/strategy/110447765/a/s3wj0b5qry?sharer=trader"
 
 # =========================
 # MENÚS
@@ -245,10 +237,10 @@ def principal_inline() -> InlineKeyboardMarkup:
         [InlineKeyboardButton("📚 Material de apoyo", callback_data="menu_material")],
         [InlineKeyboardButton("🔗 Enlaces y Conexión", callback_data="menu_enlaces")],
         [InlineKeyboardButton("📍 Ubicación", callback_data="menu_ubicacion")],
+        [InlineKeyboardButton("💳 Exness & Copy", callback_data="menu_exness")],  # <<< NUEVO
     ])
 
 def presentadores_keyboard(prefix: str) -> InlineKeyboardMarkup:
-    # prefix: "mat_pres" (material) o "link_pres" (enlaces)
     rows = []
     for pid, nombre in PRESENTADORES:
         rows.append([InlineKeyboardButton(nombre, callback_data=f"{prefix}:{pid}")])
@@ -264,7 +256,6 @@ def material_presentador_menu(pid: str) -> InlineKeyboardMarkup:
     ])
 
 def lista_archivos_inline(diccionario: Dict[str, Path], prefix: str, pid: str) -> InlineKeyboardMarkup:
-    # prefix: "video" o "doc"
     rows = []
     for nombre in diccionario.keys():
         rows.append([InlineKeyboardButton(nombre, callback_data=f"{prefix}:{pid}:{nombre}")])
@@ -290,6 +281,13 @@ def enlaces_presentador_lista(pid: str) -> InlineKeyboardMarkup:
 def ubicacion_inline() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup([
         [InlineKeyboardButton("📍 Abrir en Google Maps", url=UBICACION_URL)],
+        [InlineKeyboardButton("⬅️ Volver", callback_data="volver_menu_principal")],
+    ])
+
+def exness_inline() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton("✅ Crear cuenta en Exness", url=EXNESS_ACCOUNT_URL)],
+        [InlineKeyboardButton("🤝 Conectar al Copy JP TACTICAL", url=EXNESS_COPY_URL)],
         [InlineKeyboardButton("⬅️ Volver", callback_data="volver_menu_principal")],
     ])
 
@@ -453,22 +451,27 @@ async def text_ingreso_o_menu(update: Update, context: ContextTypes.DEFAULT_TYPE
             await accion_agenda(update, context)
             return
         if texto == BTN_MATERIAL:
-            # Mostrar lista de presentadores para Material
-            await update.message.reply_text("📚 *Material de apoyo*\nElige un presentador:",
-                                            reply_markup=presentadores_keyboard("mat_pres"),
-                                            parse_mode="Markdown")
+            await update.message.reply_text(
+                "📚 *Material de apoyo*\nElige un presentador:",
+                reply_markup=presentadores_keyboard("mat_pres"),
+                parse_mode="Markdown",
+            )
             return
         if texto == BTN_ENLACES:
-            # Menú general de enlaces: por presentador o conexiones
-            await update.message.reply_text("🔗 *Enlaces y Conexión*",
-                                            reply_markup=enlaces_inline_general(),
-                                            parse_mode="Markdown")
+            await update.message.reply_text(
+                "🔗 *Enlaces y Conexión*",
+                reply_markup=enlaces_inline_general(),
+                parse_mode="Markdown",
+            )
             return
         if texto == BTN_UBICACION:
             await accion_ubicacion(update, context)
             return
         if texto == BTN_CERRAR:
-            await update.message.reply_text("Menú ocultado. Usa /menu para mostrarlo de nuevo.", reply_markup=ReplyKeyboardRemove())
+            await update.message.reply_text(
+                "Menú ocultado. Usa /menu para mostrarlo de nuevo.",
+                reply_markup=ReplyKeyboardRemove()
+            )
             return
 
         await update.message.reply_text("Estás autenticado. Usa el menú:", reply_markup=principal_inline())
@@ -590,17 +593,21 @@ async def menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # ====== MATERIAL POR PRESENTADOR ======
     if data == "menu_material":
-        await query.edit_message_text("📚 *Material de apoyo*\nElige un presentador:",
-                                      reply_markup=presentadores_keyboard("mat_pres"),
-                                      parse_mode="Markdown")
+        await query.edit_message_text(
+            "📚 *Material de apoyo*\nElige un presentador:",
+            reply_markup=presentadores_keyboard("mat_pres"),
+            parse_mode="Markdown",
+        )
         return
 
     if data.startswith("mat_pres:"):
         pid = data.split(":", 1)[1]
         nombre = next((n for (i, n) in PRESENTADORES if i == pid), "Presentador")
-        await query.edit_message_text(f"📚 *Material de {nombre}*",
-                                      reply_markup=material_presentador_menu(pid),
-                                      parse_mode="Markdown")
+        await query.edit_message_text(
+            f"📚 *Material de {nombre}*",
+            reply_markup=material_presentador_menu(pid),
+            parse_mode="Markdown",
+        )
         return
 
     if data.startswith("mat_videos:"):
@@ -658,16 +665,25 @@ async def menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not ENLACES_CONEXION:
             await query.edit_message_text(texto + "\n\nNo hay enlaces de conexión todavía.", parse_mode="Markdown")
         else:
-            # Lista de enlaces de conexión en botones URL
             rows = [[InlineKeyboardButton(nombre, url=url)] for nombre, url in ENLACES_CONEXION.items()]
             rows.append([InlineKeyboardButton("⬅️ Volver", callback_data="menu_enlaces")])
-            await query.edit_message_text("🧩 Conexiones del evento:",
-                                          reply_markup=InlineKeyboardMarkup(rows))
+            await query.edit_message_text("🧩 Conexiones del evento:", reply_markup=InlineKeyboardMarkup(rows))
         return
 
     # ====== UBICACIÓN ======
     if data == "menu_ubicacion":
         await accion_ubicacion(query, context)
+        return
+
+    # ====== EXNESS (nuevo) ======
+    if data == "menu_exness":
+        texto = (
+            "💳 *Apertura de cuenta y Copy Trading*\n\n"
+            "1) Primero crea y **verifica** tu cuenta en Exness.\n"
+            "2) Luego conéctate a nuestro **Copy JP TACTICAL**.\n\n"
+            "Usa los botones de abajo 👇"
+        )
+        await query.edit_message_text(texto, parse_mode="Markdown", reply_markup=exness_inline())
         return
 
     # ====== Descargas concretas (videos/documentos) ======
