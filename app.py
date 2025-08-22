@@ -212,7 +212,7 @@ MATERIALES: Dict[str, Dict[str, Dict[str, Path]]] = {
     "p5": {"videos": {}, "docs": {}},
 }
 # Ejemplo futuro (archivos):
-# MATERIALES["p2"]["docs"]["Guía de setup"] = DOCS_DIR / "guia_setup.pdf"
+MATERIALES["p2"]["docs"]["Presentación"] = DOCS_DIR / "Presentación JJPuerta.pptx"
 # MATERIALES["p2"]["videos"]["Intro a la estrategia"] = VIDEOS_DIR / "intro.mp4"
 
 # ==== Videos como ENLACES (Drive) por presentador ====
@@ -630,9 +630,9 @@ async def accion_wifi(upd_or_q, context: ContextTypes.DEFAULT_TYPE):
 
     texto = (
         "📶 *Wi-Fi del evento*\n\n"
-        f"• **Nombre de red:** `{WIFI_SSID}`\n"
+        f"• **Nombre de red:** `{WIFI_SSID}`\n\n"
         #f"• **Clave:** `{WIFI_PASS}`\n\n"
-        "_*La red es abierta (no necesita clave) \n\n *Se abre una pestaña, le das en visitantes \n\n *Escoges Estelar easy conection \n\n *Y escribes la palabra Estelar2025)_"
+        "_*La red es abierta (no necesita clave) \n\n *Se abre una pestaña, le das en visitantes \n\n *Escoges Estelar easy conection \n\n *Y escribes la palabra Estelar2025_"
     )
     if edit:
         await edit(texto, parse_mode="Markdown", reply_markup=wifi_inline())
