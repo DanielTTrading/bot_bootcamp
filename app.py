@@ -212,7 +212,8 @@ MATERIALES: Dict[str, Dict[str, Dict[str, Path]]] = {
     "p5": {"videos": {}, "docs": {}},
 }
 # Ejemplo futuro (archivos):
-MATERIALES["p2"]["docs"]["Presentación"] = DOCS_DIR / "Presentación JJPuerta.pptx"
+MATERIALES["p2"]["docs"]["VALORACIÓN RAPIDA JP TACTICAL"] = DOCS_DIR / "VALORACIÓN RAPIDA JP TACTICAL.xlsx"
+MATERIALES["p2"]["docs"]["VALORACIÓN RAPIDA JP TACTICAL"] = DOCS_DIR / "VALORACIÓN RAPIDA- DIDACTICA-2.xlsx"
 # MATERIALES["p2"]["videos"]["Intro a la estrategia"] = VIDEOS_DIR / "intro.mp4"
 
 # ==== Videos como ENLACES (Drive) por presentador ====
@@ -220,7 +221,20 @@ VIDEO_LINKS: Dict[str, Dict[str, str]] = {
     "p1": {
         "Crear Cuenta en Interactive Brokers": "https://drive.google.com/file/d/1thOot6PZdxLgutH3c3JuCrIwXwRGcxeb/view?usp=sharing",
     },
-    "p2": {},
+    "p2": {
+        "DATOS DE EMPRESAS Y MACRO": "https://drive.google.com/file/d/1S-LncN3dd3eYBBCO_YgYuv5n6d2DSGAM/view?usp=sharing",
+        "DATOS DE EMPRESAS": "https://drive.google.com/file/d/1Yo1CxNipafXdbcoXK6ahpGgaHdJqdbzj/view?usp=sharing",
+        "FRED": "https://drive.google.com/file/d/12SRmvSbdhrS0qeM4dFE1EMSkScH4hKcL/view?usp=sharing",
+        "HERRAMIENTA D.O.O.R": "https://drive.google.com/file/d/1zwejfDpdC7Z0CVsCb4t0UqQD0yqdPBBe/view?usp=sharing",
+        "MORNINGSTAR": "https://drive.google.com/file/d/1POiz8YG7xYZpjxaBZ7YiZqmI7RpCQgLa/view?usp=sharing",
+        "MOVIMIENTOS DE SENADORES USA": "https://drive.google.com/file/d/1zGIZWRRs3EiMAv-i9DDe5N57XxYWkqx5/view?usp=sharing",
+        "PAGINA MORDOR INTELLIGENCE": "https://drive.google.com/file/d/17HMRzdBHknyxLeoB7JA0V9h-gtQrgZX4/view?usp=sharing",
+        "PORTAFOLIO GRANDES INVERSORES": "https://drive.google.com/file/d/1-qcP4LNAlCaqajgepQYcREC8fdzwpgY-/view?usp=sharing",
+        "SCREENER, MAPS Y DATOS": "https://drive.google.com/file/d/1Mn_SmvqXEijzAOPoNtsnoW3mWksqPdTl/view?usp=sharing",
+        "SEC": "https://drive.google.com/file/d/1OwIZ_Bk94RHjQZf0zmxtlH38frrxzb70/view?usp=sharing",
+        "VALORACIÓN COMPAÑIA": "https://drive.google.com/file/d/1mqG03xZB8urE7_VA1a8YcRO4nalxnSWD/view?usp=sharing",
+
+    },
     "p3": {},
     "p4": {},
     "p5": {},
@@ -277,7 +291,7 @@ def presentadores_keyboard(prefix: str) -> InlineKeyboardMarkup:
 def material_presentador_menu(pid: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup([
         #[InlineKeyboardButton("🎬 Videos", callback_data=f"mat_videos:{pid}")],
-        [InlineKeyboardButton("🎥 Videos (Drive)", callback_data=f"mat_videos_url:{pid}")],  # NUEVO
+        [InlineKeyboardButton("🎥 Videos", callback_data=f"mat_videos_url:{pid}")],  # NUEVO
         [InlineKeyboardButton("📄 Documentos", callback_data=f"mat_docs:{pid}")],
         [InlineKeyboardButton("⬅️ Elegir otro presentador", callback_data="menu_material")],
         [InlineKeyboardButton("🏠 Menú principal", callback_data="volver_menu_principal")],
