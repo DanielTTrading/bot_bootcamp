@@ -248,6 +248,9 @@ ENLACES_POR_PRESENTADOR: Dict[str, Dict[str, str]] = {
         "YouTube": "https://www.youtube.com/@JPTacticalTrading",
     },
     "p2": {
+        "FRED": "https://fred.stlouisfed.org/",
+        "MACRO TRENDS": "https://www.macrotrends.net/",
+        "MORNINGSTART": "https://www.morningstar.com/",
         "Web": "https://ttrading.co",
         "YouTube": "https://www.youtube.com/@JPTacticalTrading",
     },
@@ -257,10 +260,11 @@ ENLACES_POR_PRESENTADOR: Dict[str, Dict[str, str]] = {
     },
     "p4": {
         "Contactanos": "wa.me/message/KMRACEVS2P6GJ1",
-        "Instagram": "https://www.instagram.com/tupsicologoencasa?igsh=eThhdW9lamNxMmIy",
+        "Instagram Ps. Jorge Mario Rubio": "https://www.instagram.com/tupsicologoencasa?igsh=eThhdW9lamNxMmIy",
     },
     "p5": {
-        "Instagram": "https://www.instagram.com/libertank?igsh=MTV2aXVtd3JydGxuZA==",
+        "Instagram Libertank": "https://www.instagram.com/libertank?igsh=MTV2aXVtd3JydGxuZA==",
+        "Instagram Jair Viana": "https://www.instagram.com/jair.viana/",
         "Web": "https://www.instagram.com/libertank?igsh=MTV2aXVtd3JydGxuZA==",
         
     },
@@ -732,10 +736,10 @@ async def menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         pid = data.split(":", 1)[1]
         enlaces = VIDEO_LINKS.get(pid, {})
         if not enlaces:
-            await query.edit_message_text("🎥 No hay videos (Drive) por ahora.",
+            await query.edit_message_text("🎥 No hay videos por ahora.",
                                           reply_markup=material_presentador_menu(pid))
         else:
-            await query.edit_message_text("🎥 *Videos (Drive):*",
+            await query.edit_message_text("🎥 *Videos:*",
                                           reply_markup=lista_video_links_inline(pid),
                                           parse_mode="Markdown")
         return
