@@ -213,7 +213,7 @@ MATERIALES: Dict[str, Dict[str, Dict[str, Path]]] = {
 }
 # Ejemplo futuro (archivos):
 MATERIALES["p2"]["docs"]["VALORACIÓN RAPIDA JP TACTICAL"] = DOCS_DIR / "VALORACIÓN RAPIDA JP TACTICAL.xlsx"
-MATERIALES["p2"]["docs"]["VALORACIÓN RAPIDA JP TACTICAL"] = DOCS_DIR / "VALORACIÓN RAPIDA- DIDACTICA-2.xlsx"
+MATERIALES["p2"]["docs"]["VALORACIÓN RAPIDA JP TACTICAL DIDACTICA"] = DOCS_DIR / "VALORACIÓN RAPIDA- DIDACTICA-2.xlsx"
 # MATERIALES["p2"]["videos"]["Intro a la estrategia"] = VIDEOS_DIR / "intro.mp4"
 
 # ==== Videos como ENLACES (Drive) por presentador ====
