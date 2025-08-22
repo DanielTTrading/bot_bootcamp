@@ -183,7 +183,11 @@ USUARIOS_AUTORIZADOS: Dict[str, str] = {
     "1234567890": "Alejandro Bedoya",
     "alejandro.bedoya@gmail.com": "Alejandro Bedoya",
     "999888777": "Daniel Vasquez",
-    "daniel.vasquez@gmail.com": "Daniel Vasquez"
+    "daniel.vasquez@gmail.com": "Daniel Vasquez",
+    "1128269414": "Juliana Giraldo",
+    "juligiral87@gmail.com": "Juliana Giraldo",
+    "39571628": "Natalia Borda",
+    "natisbordaf@gmail.com": "Natalia Borda"
 }
 
 DATA_DIR = Path(__file__).parent / "data"
