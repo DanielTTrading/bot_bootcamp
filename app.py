@@ -630,9 +630,9 @@ async def accion_wifi(upd_or_q, context: ContextTypes.DEFAULT_TYPE):
 
     texto = (
         "📶 *Wi-Fi del evento*\n\n"
-        f"• **Nombre de red (SSID):** `{WIFI_SSID}`\n"
+        f"• **Nombre de red:** `{WIFI_SSID}`\n"
         #f"• **Clave:** `{WIFI_PASS}`\n\n"
-        "_(La red es abierta \n Se abre una pestaña le das en visitantes \n Escoges Estelar easy conection \n Y escribes la palabra Estelar2025)_"
+        "_*La red es abierta (no necesita clave) \n\n *Se abre una pestaña, le das en visitantes \n\n *Escoges Estelar easy conection \n\n *Y escribes la palabra Estelar2025)_"
     )
     if edit:
         await edit(texto, parse_mode="Markdown", reply_markup=wifi_inline())
