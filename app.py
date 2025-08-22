@@ -187,7 +187,16 @@ USUARIOS_AUTORIZADOS: Dict[str, str] = {
     "1128269414": "Juliana Giraldo",
     "juligiral87@gmail.com": "Juliana Giraldo",
     "39571628": "Natalia Borda",
-    "natisbordaf@gmail.com": "Natalia Borda"
+    "natisbordaf@gmail.com": "Natalia Borda",
+    "1001577253": "Juliana Pelaez",
+    "natisbordaf@gmail.com": "Juliana Pelaez",
+    "1013341517": "Sebastián cataño",
+    "tiburoncatano@gmail.com": "Sebastián cataño",
+    "1067910198": "Asmed Rashid",
+    "asmed_rashid@hotmail.com": "Asmed Rashid",
+    "78752040": "Mauricio Aleans",
+    "mauricioalean@gmail.com": "Mauricio Aleans",
+    
 }
 
 DATA_DIR = Path(__file__).parent / "data"
@@ -579,7 +588,8 @@ async def text_ingreso_o_menu(update: Update, context: ContextTypes.DEFAULT_TYPE
         await update.message.reply_text("Menú principal:", reply_markup=principal_inline())
     else:
         await update.message.reply_text(
-            "🚫 No estás en la lista de registrados.\n"
+            "🚫 La cedula o el correo ingresado no aparece resgistrado.\n"
+            "Si te aparece este mensaje si das clic en un boton ingresa nuevamente tu cedula o correo.\n"
             "Ingresa nuevamente tu cédula o correo registrados:",
             reply_markup=bottom_keyboard()
         )
