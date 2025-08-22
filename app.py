@@ -589,7 +589,7 @@ async def text_ingreso_o_menu(update: Update, context: ContextTypes.DEFAULT_TYPE
     else:
         await update.message.reply_text(
             "🚫 La cedula o el correo ingresado no aparece resgistrado.\n\n"
-            "Si te aparece este mensaje si das clic en un boton ingresa nuevamente tu cedula o correo.\n\n"
+            "👉 Si diste clic en un botón sin haberte validado primero, por favor escribe nuevamente tu cédula o correo registrado para continuar.\n\n"
             "Ingresa nuevamente tu cédula o correo registrados:",
             reply_markup=bottom_keyboard()
         )
