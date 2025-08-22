@@ -237,8 +237,8 @@ ENLACES_POR_PRESENTADOR: Dict[str, Dict[str, str]] = {
 
 # ==== Enlaces de conexión (generales) ====
 ENLACES_CONEXION: Dict[str, str] = {
-    # "Conexión Sala Principal": "https://example.com/sala-principal",
-    # "Conexión Sala Alterna": "https://example.com/sala-alterna",
+    "Bootcamp 23 Agosto Dia 1": "https://us06web.zoom.us/j/81355040883?pwd=3SH8zPwRFLZjAGXtttg0DM1i8ahdyT.1",
+    "Bootcamp 24 Agosto Dia 2": "https://us06web.zoom.us/j/81664314444?pwd=NuJTzeaQGI0kKFuP5mh4OuTJoWQLaY.1",
 }
 
 # Enlaces de interés (generales)
@@ -276,7 +276,7 @@ def presentadores_keyboard(prefix: str) -> InlineKeyboardMarkup:
 
 def material_presentador_menu(pid: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup([
-        [InlineKeyboardButton("🎬 Videos", callback_data=f"mat_videos:{pid}")],
+        #[InlineKeyboardButton("🎬 Videos", callback_data=f"mat_videos:{pid}")],
         [InlineKeyboardButton("🎥 Videos (Drive)", callback_data=f"mat_videos_url:{pid}")],  # NUEVO
         [InlineKeyboardButton("📄 Documentos", callback_data=f"mat_docs:{pid}")],
         [InlineKeyboardButton("⬅️ Elegir otro presentador", callback_data="menu_material")],
@@ -632,7 +632,6 @@ async def accion_wifi(upd_or_q, context: ContextTypes.DEFAULT_TYPE):
         "📶 *Wi-Fi del evento*\n\n"
         f"• **Nombre de red (SSID):** `{WIFI_SSID}`\n"
         f"• **Clave:** `{WIFI_PASS}`\n\n"
-        "_(Copia y pega los datos en la configuración de tu dispositivo.)_"
     )
     if edit:
         await edit(texto, parse_mode="Markdown", reply_markup=wifi_inline())
