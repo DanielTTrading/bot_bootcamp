@@ -48,7 +48,11 @@ PRELAUNCH_MESSAGE = os.getenv(
     "⏳ Vuelve pronto y usa /start para comenzar. 🙌"
 )
 
-def parse_fecha(date_str: str) -> datetime | None:
+# --- WIFI (para el botón Conectarme a la red) ---
+WIFI_SSID = os.getenv("WIFI_SSID", "NombreDeRed")
+WIFI_PASS = os.getenv("WIFI_PASS", "Contrasena123")
+
+def parse_fecha(date_str: str):
     try:
         y, m, d = map(int, date_str.split("-"))
         return datetime(y, m, d, tzinfo=timezone.utc)
@@ -104,74 +108,82 @@ USUARIOS_AUTORIZADOS: Dict[str, str] = {
     "elvercjb@gmail.com": "Elver Camilo Jimenez",
     "42129600": "Paula Brito",
     "pandreaco10@gmail.com": "Paula Brito",
-    "71268184": "ARIEL MARTINEZ GOMEZ",
-    "aristidesariel@gmail.com": "ARIEL MARTINEZ GOMEZ",
-    "1097305559": "JAIRO ALEXANDER SHANCHEZ BARAJAS",
-    "jaalsa95@gmail.com": "JAIRO ALEXANDER SHANCHEZ BARAJAS",
-    "1037655024": "Maria Alejandra Sanchez Sanchez",
-    "masb.25@hotmail.com": "Maria Alejandra Sanchez Sanchez",
-    "1039472598": "Daniel Mora Gómez mora gomez",
-    "danielmoragomez01@gmail.com": "Daniel Mora Gómez mora gomez",
-    "mesamaria455@gmail.com": "María José Mesa Giraldo 17 años nan",
-    "jcmesa@capitalbrokersusa.com": "nan nan",
-    "juanitapuertapaz@gmail.com": "Juanita puerta nan",
-    "j_uli345@hotmail.com": "Julian Agudelo Rodriguez Agudelo Rodriguez",
-    "52691946": "Juliana rojas lopez nan",
-    "julianarojaslopez@hotmail.com": "Juliana rojas lopez nan",
-    "80739456": "Arley giovanny rojas guerrero rojas guerrero",
-    "arley4@hotmail.com": "Arley giovanny rojas guerrero rojas guerrero",
-    "1137045027": "sandra milena cardnas cardenas",
-    "neva2101@gmail.com": "sandra milena cardnas cardenas",
-    "1017130257": "Esteban Maya restrepo restrepo",
-    "emayares1@gmail.com": "Esteban Maya restrepo restrepo",
-    "1024602544": "jhon alexander melo ramos melo ramos",
-    "jhonalexandermeloramos99@gmail.com": "jhon alexander melo ramos melo ramos",
-    "1034989739": "Juan Sebastián Rodríguez Tobon Juansert0707@gmail.com",
-    "juansert0707@gmail.com": "Juan Sebastián Rodríguez Tobon Juansert0707@gmail.com",
-    "1144029342": "stepany rodriguez arevalo totdenimjeans1@gmail.com",
-    "totdenimjeans1@gmail.com": "stepany rodriguez arevalo totdenimjeans1@gmail.com",
-    "42895010": "Monica nan",
-    "monasaldarriaga@gmail.com": "Monica nan",
-    "1000603972": "Hernán David Buenaventura Mora Hernán David Buenaventura Mora",
-    "hernan.buenaventura@gmail.com": "Hernán David Buenaventura Mora Hernán David Buenaventura Mora",
-    "16771533": "Luis alberto vergara Luis alberto vergara",
-    "luchovergara@yahoo.com": "Luis alberto vergara Luis alberto vergara",
-    "43277879": "Isabel cristina vieira jaramillo Isabel cristina vieira jaramillo",
-    "cristyvieira@hotmail.com": "Isabel cristina vieira jaramillo Isabel cristina vieira jaramillo",
-    "1007005133": "NICOLAS TORRES nan",
-    "nicolas.torres.caicedo@gmail.com": "NICOLAS TORRES nan",
-    "1005220317": "JULIAN ALEXANDER MUÑOZ LOZADA nan",
-    "julmunozlo@unal.edu.co": "JULIAN ALEXANDER MUÑOZ LOZADA nan",
-    "1011512032": "luisa tobon bustamante nan",
-    "1000888528": "Andres ruiz velasquez Andres ruiz velasquez",
-    "andreruiz122@gmail.com": "Andres ruiz velasquez Andres ruiz velasquez",
-    "1144203808": "zaid oquendo nan",
-    "zaidoquendomanjarres31@gmail.com": "zaid oquendo nan",
-    "1098809467": "andres duran leon nan",
-    "ed.andresdl@gmail.com": "andres duran leon nan",
-    "1000236231": "Cristian Camilo Carvajal nan",
-    "ccarvajalm.arq@gmail.com": "Cristian Camilo Carvajal nan",
-    "43975708": "lina patricia zuluaga lopez nan",
-    "linazuluaga06@hotmail.com": "lina patricia zuluaga lopez nan",
-    "1115183424": "cesar hernan hurtado ospina nan",
-    "chho139@hotmail.com": "cesar hernan hurtado ospina nan",
-    "1023878380": "fernando jose diaz maldonado nan",
-    "fndo.diaz@gmail.com": "fernando jose diaz maldonado nan",
-    "91488364": "jaime gonzalez nan",
-    "jaime.gonzalezjr@hotmail.com": "jaime gonzalez nan",
-    "35426141": "Nalieth karina ruiz nan",
-    "nali.ruiz@gmail.com": "Nalieth karina ruiz nan",
-    "79519766": "Daniel la rotta nan",
-    "dlarotta@gmail.com": "Daniel la rotta nan",
-    "1039455401": "juan esteban restrepo juan esteban restrepo",
-    "juan.e.restrepo.re@gmail.com": "juan esteban restrepo juan esteban restrepo",
-    "10135356": "Jorge Edison Marin Lopez nan",
-    "jemplop69@hotmail.com": "Jorge Edison Marin Lopez nan",
-    "79951742": "JUCLHER HERNANDO MORENO HIGUERA nan",
-    "hernando.moreno@juclher.com": "JUCLHER HERNANDO MORENO HIGUERA nan",
-    "1000944038": "Pablo guarin yepes nan",
-    "pabloguarinyepes@gmail.com": "Pablo guarin yepes nan",
-    "43738828": "Alexandra yepes nan",
+    "71268184": "Ariel Martinez Gomez",
+    "aristidesariel@gmail.com": "Ariel Martinez Gomez",
+    "1097305559": "Jairo Alexander Shanchez Barajas",
+    "jaalsa95@gmail.com": "Jairo Alexander Shanchez Barajas",
+    "1037655024": "Maria Alejandra Sanchez",
+    "masb.25@hotmail.com": "Maria Alejandra Sanchez",
+    "1039472598": "Daniel Mora Gomez",
+    "danielmoragomez01@gmail.com": "Daniel Mora Gomez",
+    "mesamaria455@gmail.com": "Maria Jose Mesa Giraldo",
+    "jcmesa@capitalbrokersusa.com": "JC Mesa",
+    "juanitapuertapaz@gmail.com": "Juanita Puerta",
+    "j_uli345@hotmail.com": "Julian Agudelo Rodriguez",
+    "52691946": "Juliana Rojas Lopez",
+    "julianarojaslopez@hotmail.com": "Juliana Rojas Lopez",
+    "80739456": "Arley Giovanny Rojas Guerrero",
+    "arley4@hotmail.com": "Arley Giovanny Rojas Guerrero",
+    "1137045027": "Sandra Milena Cardenas",
+    "neva2101@gmail.com": "Sandra Milena Cardenas",
+    "1017130257": "Esteban Maya Restrepo",
+    "emayares1@gmail.com": "Esteban Maya Restrepo",
+    "1024602544": "Jhon Alexander Melo Ramos",
+    "jhonalexandermeloramos99@gmail.com": "Jhon Alexander Melo Ramos",
+    "1034989739": "Juan Sebastian Rodriguez Tobon",
+    "juansert0707@gmail.com": "Juan Sebastian Rodriguez Tobon",
+    "1144029342": "Stepany Rodriguez Arevalo",
+    "totdenimjeans1@gmail.com": "Stepany Rodriguez Arevalo",
+    "42895010": "Monica",
+    "monasaldarriaga@gmail.com": "Monica",
+    "1000603972": "Hernan David Buenaventura Mora",
+    "hernan.buenaventura@gmail.com": "Hernan David Buenaventura Mora",
+    "16771533": "Luis Alberto Vergara",
+    "luchovergara@yahoo.com": "Luis Alberto Vergara",
+    "43277879": "Isabel Cristina Vieira Jaramillo",
+    "cristyvieira@hotmail.com": "Isabel Cristina Vieira Jaramillo",
+    "1007005133": "Nicolas Torres",
+    "nicolas.torres.caicedo@gmail.com": "Nicolas Torres",
+    "1005220317": "Julian Alexander Muñoz Lozada",
+    "julmunozlo@unal.edu.co": "Julian Alexander Muñoz Lozada",
+    "1011512032": "Luisa Tobon Bustamante",
+    "1000888528": "Andres Ruiz Velasquez",
+    "andreruiz122@gmail.com": "Andres Ruiz Velasquez",
+    "1144203808": "Zaid Oquendo",
+    "zaidoquendomanjarres31@gmail.com": "Zaid Oquendo",
+    "1098809467": "Andres Duran Leon",
+    "ed.andresdl@gmail.com": "Andres Duran Leon",
+    "1000236231": "Cristian Camilo Carvajal",
+    "ccarvajalm.arq@gmail.com": "Cristian Camilo Carvajal",
+    "43975708": "Lina Patricia Zuluaga Lopez",
+    "linazuluaga06@hotmail.com": "Lina Patricia Zuluaga Lopez",
+    "1115183424": "Cesar Hernan Hurtado Ospina",
+    "chho139@hotmail.com": "Cesar Hernan Hurtado Ospina",
+    "1023878380": "Fernando Jose Diaz Maldonado",
+    "fndo.diaz@gmail.com": "Fernando Jose Diaz Maldonado",
+    "91488364": "Jaime Gonzalez",
+    "jaime.gonzalezjr@hotmail.com": "Jaime Gonzalez",
+    "35426141": "Nalieth Karina Ruiz",
+    "nali.ruiz@gmail.com": "Nalieth Karina Ruiz",
+    "79519766": "Daniel La Rotta",
+    "dlarotta@gmail.com": "Daniel La Rotta",
+    "1039455401": "Juan Esteban Restrepo",
+    "juan.e.restrepo.re@gmail.com": "Juan Esteban Restrepo",
+    "10135356": "Jorge Edison Marin Lopez",
+    "jemplop69@hotmail.com": "Jorge Edison Marin Lopez",
+    "79951742": "Juclher Hernando Moreno Higuera",
+    "hernando.moreno@juclher.com": "Juclher Hernando Moreno Higuera",
+    "1000944038": "Pablo Guarin Yepes",
+    "pabloguarinyepes@gmail.com": "Pablo Guarin Yepes",
+    "43738828": "Alexandra Yepes",
+    "1001699989": "Oscar Lopez",
+    "oscarlopez@gmail.com": "Oscar Lopez",
+    "987654321": "Carlos Perez",
+    "carlosperez@hotmail.com": "Carlos Perez",
+    "1234567890": "Alejandro Bedoya",
+    "alejandro.bedoya@gmail.com": "Alejandro Bedoya",
+    "999888777": "Daniel Vasquez",
+    "daniel.vasquez@gmail.com": "Daniel Vasquez"
 }
 
 DATA_DIR = Path(__file__).parent / "data"
@@ -191,13 +203,27 @@ PRESENTADORES = [
     ("p5", "Jair Viana"),
 ]
 
-# ==== Materiales por presentador (rellena cuando tengas archivos) ====
+# ==== Materiales por presentador (archivos locales) ====
 MATERIALES: Dict[str, Dict[str, Dict[str, Path]]] = {
     "p1": {"videos": {}, "docs": {}},
     "p2": {"videos": {}, "docs": {}},
     "p3": {"videos": {}, "docs": {}},
     "p4": {"videos": {}, "docs": {}},
     "p5": {"videos": {}, "docs": {}},
+}
+# Ejemplo futuro (archivos):
+# MATERIALES["p2"]["docs"]["Guía de setup"] = DOCS_DIR / "guia_setup.pdf"
+# MATERIALES["p2"]["videos"]["Intro a la estrategia"] = VIDEOS_DIR / "intro.mp4"
+
+# ==== Videos como ENLACES (Drive) por presentador ====
+VIDEO_LINKS: Dict[str, Dict[str, str]] = {
+    "p1": {
+        "Crear Cuenta en Interactive Brokers": "https://drive.google.com/file/d/1thOot6PZdxLgutH3c3JuCrIwXwRGcxeb/view?usp=sharing",
+    },
+    "p2": {},
+    "p3": {},
+    "p4": {},
+    "p5": {},
 }
 
 # ==== Enlaces de interés por presentador ====
@@ -237,7 +263,8 @@ def principal_inline() -> InlineKeyboardMarkup:
         [InlineKeyboardButton("📚 Material de apoyo", callback_data="menu_material")],
         [InlineKeyboardButton("🔗 Enlaces y Conexión", callback_data="menu_enlaces")],
         [InlineKeyboardButton("📍 Ubicación", callback_data="menu_ubicacion")],
-        [InlineKeyboardButton("💳 Exness & Copy", callback_data="menu_exness")],  # <<< NUEVO
+        [InlineKeyboardButton("💳 Exness & Copy", callback_data="menu_exness")],
+        [InlineKeyboardButton("📶 Conectarme a la red", callback_data="menu_wifi")],  # NUEVO
     ])
 
 def presentadores_keyboard(prefix: str) -> InlineKeyboardMarkup:
@@ -250,6 +277,7 @@ def presentadores_keyboard(prefix: str) -> InlineKeyboardMarkup:
 def material_presentador_menu(pid: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup([
         [InlineKeyboardButton("🎬 Videos", callback_data=f"mat_videos:{pid}")],
+        [InlineKeyboardButton("🎥 Videos (Drive)", callback_data=f"mat_videos_url:{pid}")],  # NUEVO
         [InlineKeyboardButton("📄 Documentos", callback_data=f"mat_docs:{pid}")],
         [InlineKeyboardButton("⬅️ Elegir otro presentador", callback_data="menu_material")],
         [InlineKeyboardButton("🏠 Menú principal", callback_data="volver_menu_principal")],
@@ -260,6 +288,15 @@ def lista_archivos_inline(diccionario: Dict[str, Path], prefix: str, pid: str) -
     for nombre in diccionario.keys():
         rows.append([InlineKeyboardButton(nombre, callback_data=f"{prefix}:{pid}:{nombre}")])
     rows.append([InlineKeyboardButton("⬅️ Volver", callback_data=f"mat_pres:{pid}")])
+    return InlineKeyboardMarkup(rows)
+
+def lista_video_links_inline(pid: str) -> InlineKeyboardMarkup:
+    enlaces = VIDEO_LINKS.get(pid, {})
+    rows = []
+    for nombre, url in enlaces.items():
+        rows.append([InlineKeyboardButton(nombre, url=url)])
+    rows.append([InlineKeyboardButton("⬅️ Volver", callback_data=f"mat_pres:{pid}")])
+    rows.append([InlineKeyboardButton("🏠 Menú principal", callback_data="volver_menu_principal")])
     return InlineKeyboardMarkup(rows)
 
 def enlaces_inline_general() -> InlineKeyboardMarkup:
@@ -291,18 +328,24 @@ def exness_inline() -> InlineKeyboardMarkup:
         [InlineKeyboardButton("⬅️ Volver", callback_data="volver_menu_principal")],
     ])
 
+def wifi_inline() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton("⬅️ Volver", callback_data="volver_menu_principal")],
+    ])
+
 # Reply keyboard (persistente)
 BTN_AGENDA = "📅 Agenda"
 BTN_MATERIAL = "📚 Material de apoyo"
 BTN_ENLACES = "🔗 Enlaces y Conexión"
 BTN_UBICACION = "📍 Ubicación"
+BTN_WIFI = "📶 Conectarme a la red"  # NUEVO
 BTN_CERRAR = "❌ Cerrar menú"
 
 def bottom_keyboard() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(BTN_AGENDA), KeyboardButton(BTN_MATERIAL)],
-            [KeyboardButton(BTN_ENLACES), KeyboardButton(BTN_UBICACION)],
+            [KeyboardButton(BTN_ENLACES), KeyboardButton(BTN_UBICACION), KeyboardButton(BTN_WIFI)],  # agregado WIFI
             [KeyboardButton(BTN_CERRAR)],
         ],
         resize_keyboard=True,
@@ -467,6 +510,9 @@ async def text_ingreso_o_menu(update: Update, context: ContextTypes.DEFAULT_TYPE
         if texto == BTN_UBICACION:
             await accion_ubicacion(update, context)
             return
+        if texto == BTN_WIFI:
+            await accion_wifi(update, context)
+            return
         if texto == BTN_CERRAR:
             await update.message.reply_text(
                 "Menú ocultado. Usa /menu para mostrarlo de nuevo.",
@@ -564,6 +610,35 @@ async def accion_ubicacion(upd_or_q, context: ContextTypes.DEFAULT_TYPE):
     else:
         await message.reply_text(texto, parse_mode="Markdown", reply_markup=ubicacion_inline())
 
+async def accion_wifi(upd_or_q, context: ContextTypes.DEFAULT_TYPE):
+    # Bloqueo en pre-lanzamiento (por si lo quieres restringir)
+    en_pre, msg = esta_en_prelanzamiento()
+    if en_pre:
+        if isinstance(upd_or_q, Update):
+            await upd_or_q.message.reply_text(msg)
+        else:
+            await upd_or_q.message.reply_text(msg)
+        return
+
+    if isinstance(upd_or_q, Update):
+        message = upd_or_q.message
+        edit = None
+    else:
+        q = upd_or_q
+        message = q.message
+        edit = q.edit_message_text
+
+    texto = (
+        "📶 *Wi-Fi del evento*\n\n"
+        f"• **Nombre de red (SSID):** `{WIFI_SSID}`\n"
+        f"• **Clave:** `{WIFI_PASS}`\n\n"
+        "_(Copia y pega los datos en la configuración de tu dispositivo.)_"
+    )
+    if edit:
+        await edit(texto, parse_mode="Markdown", reply_markup=wifi_inline())
+    else:
+        await message.reply_text(texto, parse_mode="Markdown", reply_markup=wifi_inline())
+
 async def menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -622,6 +697,18 @@ async def menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                           parse_mode="Markdown")
         return
 
+    if data.startswith("mat_videos_url:"):  # NUEVO (Drive)
+        pid = data.split(":", 1)[1]
+        enlaces = VIDEO_LINKS.get(pid, {})
+        if not enlaces:
+            await query.edit_message_text("🎥 No hay videos (Drive) por ahora.",
+                                          reply_markup=material_presentador_menu(pid))
+        else:
+            await query.edit_message_text("🎥 *Videos (Drive):*",
+                                          reply_markup=lista_video_links_inline(pid),
+                                          parse_mode="Markdown")
+        return
+
     if data.startswith("mat_docs:"):
         pid = data.split(":", 1)[1]
         docs = MATERIALES.get(pid, {}).get("docs", {})
@@ -675,7 +762,7 @@ async def menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await accion_ubicacion(query, context)
         return
 
-    # ====== EXNESS (nuevo) ======
+    # ====== EXNESS ======
     if data == "menu_exness":
         texto = (
             "💳 *Apertura de cuenta y Copy Trading*\n\n"
@@ -684,6 +771,11 @@ async def menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Usa los botones de abajo 👇"
         )
         await query.edit_message_text(texto, parse_mode="Markdown", reply_markup=exness_inline())
+        return
+
+    # ====== WIFI ======
+    if data == "menu_wifi":
+        await accion_wifi(query, context)
         return
 
     # ====== Descargas concretas (videos/documentos) ======
