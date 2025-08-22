@@ -197,7 +197,9 @@ USUARIOS_AUTORIZADOS: Dict[str, str] = {
     "78752040": "Mauricio Aleans",
     "mauricioalean@gmail.com": "Mauricio Aleans",
     "1018419832": "Sebastián Martinez",
-    "s.martinez48@hotmail.com": "Sebastián Martinez"
+    "s.martinez48@hotmail.com": "Sebastián Martinez",
+     "1098734894": "Carlos Gonzalez",
+    "carlosgonzalezramirez.gr@gmail.com": "Carlos Gonzalez"
     
 }
 
