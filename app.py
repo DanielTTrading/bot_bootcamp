@@ -220,6 +220,7 @@ MATERIALES["p2"]["docs"]["VALORACIÓN RAPIDA JP TACTICAL DIDACTICA"] = DOCS_DIR 
 VIDEO_LINKS: Dict[str, Dict[str, str]] = {
     "p1": {
         "Crear Cuenta en Interactive Brokers": "https://drive.google.com/file/d/1thOot6PZdxLgutH3c3JuCrIwXwRGcxeb/view?usp=sharing",
+        "Crear Cuenta en TRII": "https://drive.google.com/file/d/1thOot6PZdxLgutH3c3JuCrIwXwRGcxeb/view?usp=sharing",
     },
     "p2": {
         "DATOS DE EMPRESAS Y MACRO": "https://drive.google.com/file/d/1S-LncN3dd3eYBBCO_YgYuv5n6d2DSGAM/view?usp=sharing",
@@ -242,11 +243,27 @@ VIDEO_LINKS: Dict[str, Dict[str, str]] = {
 
 # ==== Enlaces de interés por presentador ====
 ENLACES_POR_PRESENTADOR: Dict[str, Dict[str, str]] = {
-    "p1": {},
-    "p2": {},
-    "p3": {},
-    "p4": {},
-    "p5": {},
+    "p1": {
+        "Web": "https://ttrading.co",
+        "YouTube": "https://www.youtube.com/@JPTacticalTrading",
+    },
+    "p2": {
+        "Web": "https://ttrading.co",
+        "YouTube": "https://www.youtube.com/@JPTacticalTrading",
+    },
+    "p3": {
+        "Web": "https://ttrading.co",
+        "YouTube": "https://www.youtube.com/@JPTacticalTrading",
+    },
+    "p4": {
+        "Contactanos": "wa.me/message/KMRACEVS2P6GJ1",
+        "Instagram": "https://www.instagram.com/tupsicologoencasa?igsh=eThhdW9lamNxMmIy",
+    },
+    "p5": {
+        "Instagram": "https://www.instagram.com/libertank?igsh=MTV2aXVtd3JydGxuZA==",
+        "Web": "https://www.instagram.com/libertank?igsh=MTV2aXVtd3JydGxuZA==",
+        
+    },
 }
 
 # ==== Enlaces de conexión (generales) ====
