@@ -588,8 +588,8 @@ async def text_ingreso_o_menu(update: Update, context: ContextTypes.DEFAULT_TYPE
         await update.message.reply_text("Menú principal:", reply_markup=principal_inline())
     else:
         await update.message.reply_text(
-            "🚫 La cedula o el correo ingresado no aparece resgistrado.\n"
-            "Si te aparece este mensaje si das clic en un boton ingresa nuevamente tu cedula o correo.\n"
+            "🚫 La cedula o el correo ingresado no aparece resgistrado.\n\n"
+            "Si te aparece este mensaje si das clic en un boton ingresa nuevamente tu cedula o correo.\n\n"
             "Ingresa nuevamente tu cédula o correo registrados:",
             reply_markup=bottom_keyboard()
         )
