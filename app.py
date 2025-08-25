@@ -315,6 +315,10 @@ UBICACION_URL = "https://maps.app.goo.gl/zZfR7kPo9ZR1AUtu9"
 EXNESS_ACCOUNT_URL = "https://one.exnesstrack.org/a/s3wj0b5qry"
 EXNESS_COPY_URL = "https://social-trading.exness.com/strategy/227834645/a/s3wj0b5qry?sharer=trader"
 
+
+# ==== Clase de los martes ====
+TUES_CLASS_URL = "https://us06web.zoom.us/j/84941616809?pwd=qEOUWQHxBkQ9a3YyP6B6S3xSBalJgP.1"
+
 # =========================
 # MENÚS
 # =========================
