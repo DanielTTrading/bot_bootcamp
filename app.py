@@ -330,7 +330,8 @@ def principal_inline() -> InlineKeyboardMarkup:
         [InlineKeyboardButton("🔗 Enlaces y Conexión", callback_data="menu_enlaces")],
         [InlineKeyboardButton("📍 Ubicación", callback_data="menu_ubicacion")],
         [InlineKeyboardButton("💳 Exness & Copy", callback_data="menu_exness")],
-        [InlineKeyboardButton("📶 Conectarme a la red", callback_data="menu_wifi")],  # NUEVO
+        [InlineKeyboardButton("📶 Conectarme a la red", callback_data="menu_wifi")],
+        [InlineKeyboardButton("📆 Clase de los martes", url=TUES_CLASS_URL)], # NUEVO
     ])
 
 def presentadores_keyboard(prefix: str) -> InlineKeyboardMarkup:
