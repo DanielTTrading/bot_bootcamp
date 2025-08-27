@@ -317,7 +317,7 @@ EXNESS_COPY_URL = "https://social-trading.exness.com/strategy/227834645/a/s3wj0b
 
 
 # ==== Clase de los martes ====
-TUES_CLASS_URL = "https://us06web.zoom.us/j/84941616809?pwd=qEOUWQHxBkQ9a3YyP6B6S3xSBalJgP.1"
+TUES_CLASS_URL = "https://us06web.zoom.us/j/83517450581?pwd=Ls7JvQWFVWpIQGuWPJrmJyTb0hm5vR.1"
 
 # =========================
 # MENÚS
@@ -328,10 +328,10 @@ def principal_inline() -> InlineKeyboardMarkup:
         [InlineKeyboardButton("📅 Agenda", callback_data="menu_agenda")],
         [InlineKeyboardButton("📚 Material de apoyo", callback_data="menu_material")],
         [InlineKeyboardButton("🔗 Enlaces y Conexión", callback_data="menu_enlaces")],
-        [InlineKeyboardButton("📍 Ubicación", callback_data="menu_ubicacion")],
+        #[InlineKeyboardButton("📍 Ubicación", callback_data="menu_ubicacion")],
         [InlineKeyboardButton("💳 Exness & Copy", callback_data="menu_exness")],
-        [InlineKeyboardButton("📶 Conectarme a la red", callback_data="menu_wifi")],
-        [InlineKeyboardButton("📆 Clase de los martes", url=TUES_CLASS_URL)], # NUEVO
+        #[InlineKeyboardButton("📶 Conectarme a la red", callback_data="menu_wifi")],
+        [InlineKeyboardButton("📆 Clase de Exness", url=TUES_CLASS_URL)], # NUEVO
     ])
 
 def presentadores_keyboard(prefix: str) -> InlineKeyboardMarkup:
@@ -369,7 +369,7 @@ def lista_video_links_inline(pid: str) -> InlineKeyboardMarkup:
 def enlaces_inline_general() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup([
         [InlineKeyboardButton("⭐ Enlaces por presentador", callback_data="enlaces_por_presentador")],
-        [InlineKeyboardButton("🧩 Conexión al evento", callback_data="enlaces_conexion")],
+        #[InlineKeyboardButton("🧩 Conexión al evento", callback_data="enlaces_conexion")],
         [InlineKeyboardButton("⬅️ Volver", callback_data="volver_menu_principal")],
     ])
 
