@@ -827,7 +827,6 @@ async def broadcast_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # ← Mostrar menú nuevamente
     await update.message.reply_text("Menú principal:", reply_markup=principal_inline())
     return ConversationHandler.END
-D
 
 # =========================
 # MENÚ CALLBACKS
