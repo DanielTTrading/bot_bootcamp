@@ -23,6 +23,7 @@ from telegram.ext import (
     MessageHandler,
     CallbackQueryHandler,
     ContextTypes,
+    ConversationHandler,   # <── NUEVO
     filters,
 )
 
@@ -52,6 +53,19 @@ PRELAUNCH_MESSAGE = os.getenv(
 WIFI_SSID = os.getenv("WIFI_SSID", "NombreDeRed")
 WIFI_PASS = os.getenv("WIFI_PASS", "Contrasena123")
 
+# --- ADMIN & BROADCAST (NUEVO) ---
+# Pega aquí los IDs de los administradores (números de Telegram)
+ADMINS: set[int] = {
+    7710920544,  # <-- reemplaza por tus IDs
+    
+}
+
+# Pega aquí, si quieres, los IDs de los destinatarios del broadcast (usuarios)
+# Si lo dejas vacío, el bot usará automáticamente los que se vayan autenticando
+BROADCAST_IDS: set[int] = {6508902216}
+# Colección de usuarios autenticados en esta ejecución (para broadcast si BROADCAST_IDS está vacío)
+KNOWN_USERS: set[int] = set()
+
 def parse_fecha(date_str: str):
     try:
         y, m, d = map(int, date_str.split("-"))
@@ -63,15 +77,9 @@ def hoy_utc() -> datetime:
     return datetime.now(timezone.utc)
 
 def esta_en_prelanzamiento() -> tuple[bool, str]:
-    """
-    True + mensaje si aún no se habilita el bot completo.
-    Habilita desde (LAUNCH_DATE - PRELAUNCH_DAYS).
-    Si LAUNCH_DATE no está, no hay pre-lanzamiento.
-    """
     launch_dt = parse_fecha(LAUNCH_DATE_STR)
     if not launch_dt:
-        return (False, "")  # habilitado
-
+        return (False, "")
     habilita_dt = launch_dt - timedelta(days=PRELAUNCH_DAYS)
     now = hoy_utc()
     if now < habilita_dt:
@@ -198,7 +206,7 @@ USUARIOS_AUTORIZADOS: Dict[str, str] = {
     "mauricioalean@gmail.com": "Mauricio Aleans",
     "1018419832": "Sebastián Martinez",
     "s.martinez48@hotmail.com": "Sebastián Martinez",
-     "1098734894": "Carlos Gonzalez",
+    "1098734894": "Carlos Gonzalez",
     "carlosgonzalezramirez.gr@gmail.com": "Carlos Gonzalez",
     "1014204476": "Rosenberg Moreno",
     "rosenbergmoreno91@gmail.com": "Rosenberg Moreno",
@@ -210,18 +218,16 @@ USUARIOS_AUTORIZADOS: Dict[str, str] = {
     "piligonzalez@hotmail.com": "Pilar Gonzalez",
     "1036658241": "Esteban Salinas",
     "salynas112@gmail.com": "Esteban Salinas"
-    
 }
 
 DATA_DIR = Path(__file__).parent / "data"
-AGENDA_PDF = DATA_DIR / "agenda.pdf"   # Si no existe, se enviará texto
+AGENDA_PDF = DATA_DIR / "agenda.pdf"
 VIDEOS_DIR = DATA_DIR / "videos"
 DOCS_DIR = DATA_DIR / "docs"
 
 # =========================
 # PRESENTADORES
 # =========================
-# IDs cortos para callback_data
 PRESENTADORES = [
     ("p1", "Juan Pablo Vieira"),
     ("p2", "Juan José Puerta"),
@@ -230,7 +236,6 @@ PRESENTADORES = [
     ("p5", "Jair Viana"),
 ]
 
-# ==== Materiales por presentador (archivos locales) ====
 MATERIALES: Dict[str, Dict[str, Dict[str, Path]]] = {
     "p1": {"videos": {}, "docs": {}},
     "p2": {"videos": {}, "docs": {}},
@@ -238,12 +243,9 @@ MATERIALES: Dict[str, Dict[str, Dict[str, Path]]] = {
     "p4": {"videos": {}, "docs": {}},
     "p5": {"videos": {}, "docs": {}},
 }
-# Ejemplo futuro (archivos):
 MATERIALES["p2"]["docs"]["VALORACIÓN RAPIDA JP TACTICAL"] = DOCS_DIR / "VALORACIÓN RAPIDA JP TACTICAL.xlsx"
 MATERIALES["p2"]["docs"]["VALORACIÓN RAPIDA JP TACTICAL DIDACTICA"] = DOCS_DIR / "VALORACIÓN RAPIDA- DIDACTICA-2.xlsx"
-# MATERIALES["p2"]["videos"]["Intro a la estrategia"] = VIDEOS_DIR / "intro.mp4"
 
-# ==== Videos como ENLACES (Drive) por presentador ====
 VIDEO_LINKS: Dict[str, Dict[str, str]] = {
     "p1": {
         "Crear Cuenta en Interactive Brokers": "https://drive.google.com/file/d/1thOot6PZdxLgutH3c3JuCrIwXwRGcxeb/view?usp=sharing",
@@ -261,19 +263,14 @@ VIDEO_LINKS: Dict[str, Dict[str, str]] = {
         "SCREENER, MAPS Y DATOS": "https://drive.google.com/file/d/1Mn_SmvqXEijzAOPoNtsnoW3mWksqPdTl/view?usp=sharing",
         "SEC": "https://drive.google.com/file/d/1OwIZ_Bk94RHjQZf0zmxtlH38frrxzb70/view?usp=sharing",
         "VALORACIÓN COMPAÑIA": "https://drive.google.com/file/d/1mqG03xZB8urE7_VA1a8YcRO4nalxnSWD/view?usp=sharing",
-
     },
     "p3": {},
     "p4": {},
     "p5": {},
 }
 
-# ==== Enlaces de interés por presentador ====
 ENLACES_POR_PRESENTADOR: Dict[str, Dict[str, str]] = {
-    "p1": {
-        "Web": "https://ttrading.co",
-        "YouTube": "https://www.youtube.com/@JPTacticalTrading",
-    },
+    "p1": {"Web": "https://ttrading.co", "YouTube": "https://www.youtube.com/@JPTacticalTrading"},
     "p2": {
         "FRED": "https://fred.stlouisfed.org/",
         "MACRO TRENDS": "https://www.macrotrends.net/",
@@ -281,10 +278,7 @@ ENLACES_POR_PRESENTADOR: Dict[str, Dict[str, str]] = {
         "Web": "https://ttrading.co",
         "YouTube": "https://www.youtube.com/@JPTacticalTrading",
     },
-    "p3": {
-        "Web": "https://ttrading.co",
-        "YouTube": "https://www.youtube.com/@JPTacticalTrading",
-    },
+    "p3": {"Web": "https://ttrading.co", "YouTube": "https://www.youtube.com/@JPTacticalTrading"},
     "p4": {
         "Contactanos": "wa.me/message/KMRACEVS2P6GJ1",
         "Instagram Ps. Jorge Mario Rubio": "https://www.instagram.com/tupsicologoencasa?igsh=eThhdW9lamNxMmIy",
@@ -293,17 +287,14 @@ ENLACES_POR_PRESENTADOR: Dict[str, Dict[str, str]] = {
         "Instagram Libertank": "https://www.instagram.com/libertank?igsh=MTV2aXVtd3JydGxuZA==",
         "Instagram Jair Viana": "https://www.instagram.com/jair.viana/",
         "Web": "https://www.instagram.com/libertank?igsh=MTV2aXVtd3JydGxuZA==",
-        
     },
 }
 
-# ==== Enlaces de conexión (generales) ====
 ENLACES_CONEXION: Dict[str, str] = {
     "Bootcamp 23 Agosto Dia 1": "https://us06web.zoom.us/j/81355040883?pwd=3SH8zPwRFLZjAGXtttg0DM1i8ahdyT.1",
     "Bootcamp 24 Agosto Dia 2": "https://us06web.zoom.us/j/81664314444?pwd=NuJTzeaQGI0kKFuP5mh4OuTJoWQLaY.1",
 }
 
-# Enlaces de interés (generales)
 ENLACES_INTERES: Dict[str, str] = {
     "Página JP Tactical Trading": "https://ttrading.co",
     "Canal YouTube": "https://www.youtube.com/@JPTacticalTrading",
@@ -311,14 +302,11 @@ ENLACES_INTERES: Dict[str, str] = {
 
 UBICACION_URL = "https://maps.app.goo.gl/zZfR7kPo9ZR1AUtu9"
 
-# ==== Exness (nuevo) ====
 EXNESS_ACCOUNT_URL = "https://one.exnesstrack.org/a/s3wj0b5qry"
 EXNESS_COPY_URL = "https://social-trading.exness.com/strategy/227834645/a/s3wj0b5qry?sharer=trader"
 
-
 # ==== Clase de los martes ====
 TUES_CLASS_URL = "https://us06web.zoom.us/j/83517450581?pwd=Ls7JvQWFVWpIQGuWPJrmJyTb0hm5vR.1"
-
 
 # ==== Estrategia del día ====
 ESTRATEGIA_IMG = DATA_DIR / "estrategia_ibm.jpg"
@@ -337,51 +325,20 @@ ESTRATEGIA_TEXTO = (
     "Saludos,\nEquipo JP Tactical Trading"
 )
 
-
 # =========================
 # MENÚS
 # =========================
 
 def principal_inline() -> InlineKeyboardMarkup:
+    # (Mantenemos el botón admin visible; si no eres admin, el flujo lo bloquea)
     return InlineKeyboardMarkup([
-        #[InlineKeyboardButton("📅 Agenda", callback_data="menu_agenda")],
         [InlineKeyboardButton("📚 Material de apoyo", callback_data="menu_material")],
         [InlineKeyboardButton("🔗 Enlaces y Conexión", callback_data="menu_enlaces")],
-        #[InlineKeyboardButton("📍 Ubicación", callback_data="menu_ubicacion")],
         [InlineKeyboardButton("💳 Exness & Copy", callback_data="menu_exness")],
-        #[InlineKeyboardButton("📶 Conectarme a la red", callback_data="menu_wifi")],
-        [InlineKeyboardButton("📆 Clase de Exness 7:00 pm", url=TUES_CLASS_URL)], # NUEVO
+        [InlineKeyboardButton("📆 Clase de Exness 7:00 pm", url=TUES_CLASS_URL)],
         [InlineKeyboardButton("🎯 Estrategia del día", callback_data="menu_estrategia")],
+        [InlineKeyboardButton("📣 Enviar mensaje (Admin)", callback_data="admin_broadcast")],  # <── NUEVO
     ])
-
-async def accion_estrategia(upd_or_q, context: ContextTypes.DEFAULT_TYPE):
-    """Muestra la Estrategia del día (texto + imagen)."""
-    # Unifica objetos
-    if isinstance(upd_or_q, Update):
-        chat = upd_or_q.effective_chat
-        message = upd_or_q.effective_message
-        edit = None
-    else:
-        q = upd_or_q
-        chat = q.message.chat
-        message = q.message
-        edit = None  # enviaremos como nuevos mensajes
-
-    # 1) Enviar el texto (con Markdown para negritas/itálicas)
-    await chat.send_message(ESTRATEGIA_TEXTO, parse_mode="Markdown")
-
-    # 2) Enviar la imagen si existe
-    if ESTRATEGIA_IMG.exists():
-        try:
-            with ESTRATEGIA_IMG.open("rb") as f:
-                await chat.send_photo(photo=f, caption="Estrategia del día: IBM")
-        except Exception as e:
-            await chat.send_message(f"⚠️ No se pudo adjuntar la imagen de la estrategia. Detalle: {e}")
-    else:
-        await chat.send_message("⚠️ No se encontró la imagen de la estrategia en data/estrategia_ibm.jpg")
-
-    # 3) Ofrecer volver al menú
-    await chat.send_message("¿Qué deseas hacer ahora?", reply_markup=principal_inline())
 
 def presentadores_keyboard(prefix: str) -> InlineKeyboardMarkup:
     rows = []
@@ -392,8 +349,7 @@ def presentadores_keyboard(prefix: str) -> InlineKeyboardMarkup:
 
 def material_presentador_menu(pid: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup([
-        #[InlineKeyboardButton("🎬 Videos", callback_data=f"mat_videos:{pid}")],
-        [InlineKeyboardButton("🎥 Videos", callback_data=f"mat_videos_url:{pid}")],  # NUEVO
+        [InlineKeyboardButton("🎥 Videos", callback_data=f"mat_videos_url:{pid}")],
         [InlineKeyboardButton("📄 Documentos", callback_data=f"mat_docs:{pid}")],
         [InlineKeyboardButton("⬅️ Elegir otro presentador", callback_data="menu_material")],
         [InlineKeyboardButton("🏠 Menú principal", callback_data="volver_menu_principal")],
@@ -418,7 +374,6 @@ def lista_video_links_inline(pid: str) -> InlineKeyboardMarkup:
 def enlaces_inline_general() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup([
         [InlineKeyboardButton("⭐ Enlaces por presentador", callback_data="enlaces_por_presentador")],
-        #[InlineKeyboardButton("🧩 Conexión al evento", callback_data="enlaces_conexion")],
         [InlineKeyboardButton("⬅️ Volver", callback_data="volver_menu_principal")],
     ])
 
@@ -454,14 +409,14 @@ BTN_AGENDA = "📅 Agenda"
 BTN_MATERIAL = "📚 Material de apoyo"
 BTN_ENLACES = "🔗 Enlaces y Conexión"
 BTN_UBICACION = "📍 Ubicación"
-BTN_WIFI = "📶 Conectarme a la red"  # NUEVO
+BTN_WIFI = "📶 Conectarme a la red"
 BTN_CERRAR = "❌ Cerrar menú"
 
 def bottom_keyboard() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(BTN_AGENDA), KeyboardButton(BTN_MATERIAL)],
-            [KeyboardButton(BTN_ENLACES), KeyboardButton(BTN_UBICACION), KeyboardButton(BTN_WIFI)],  # agregado WIFI
+            [KeyboardButton(BTN_ENLACES), KeyboardButton(BTN_UBICACION), KeyboardButton(BTN_WIFI)],
             [KeyboardButton(BTN_CERRAR)],
         ],
         resize_keyboard=True,
@@ -475,12 +430,13 @@ def bottom_keyboard() -> ReplyKeyboardMarkup:
 def normaliza(clave: str) -> str:
     return clave.strip().lower()
 
+def get_broadcast_targets() -> list[int]:
+    # Si pusiste IDs en BROADCAST_IDS, usa esos; si no, usa los autenticados
+    if BROADCAST_IDS:
+        return list(BROADCAST_IDS)
+    return list(KNOWN_USERS)  # se llenan al autenticarse
+
 async def envia_documento(upd_or_q, context: ContextTypes.DEFAULT_TYPE, ruta: Path, nombre_mostrar: str):
-    """
-    Acepta Update o CallbackQuery (upd_or_q).
-    Envía documentos y videos con manejo de timeouts + reintentos.
-    """
-    # Unificar chat y message
     if isinstance(upd_or_q, Update):
         chat = upd_or_q.effective_chat
         message = upd_or_q.effective_message
@@ -554,7 +510,6 @@ class PerfilUsuario:
     nombre: str
     autenticado: bool = False
 
-# Guardaremos por user_id un dict con su perfil
 PERFILES: Dict[int, PerfilUsuario] = {}
 
 async def ensure_auth(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Tuple[bool, int]:
@@ -567,7 +522,6 @@ async def ensure_auth(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Tup
 # =========================
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Modo pre-lanzamiento
     en_pre, msg = esta_en_prelanzamiento()
     if en_pre:
         await update.message.reply_text(msg)
@@ -584,6 +538,8 @@ async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/start - Iniciar/validar acceso\n"
         "/menu - Mostrar menú\n"
         "/help - Ayuda\n"
+        "/broadcast - (admins) iniciar envío masivo\n"
+        "/cancel - cancelar envío masivo\n"
         "\nPrimero valida tu cédula o correo registrado. Luego usa el menú."
     )
 
@@ -595,7 +551,6 @@ async def menu_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Menú principal:", reply_markup=principal_inline())
 
 async def text_ingreso_o_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Si aún estamos en pre-lanzamiento, no permitir flujos
     en_pre, msg = esta_en_prelanzamiento()
     if en_pre:
         await update.message.reply_text(msg)
@@ -604,7 +559,6 @@ async def text_ingreso_o_menu(update: Update, context: ContextTypes.DEFAULT_TYPE
     autenticado, user_id = await ensure_auth(update, context)
     texto = (update.message.text or "").strip()
 
-    # Si ya está autenticado, procesar botones del teclado persistente
     if autenticado:
         if texto == BTN_AGENDA:
             await accion_agenda(update, context)
@@ -648,6 +602,7 @@ async def text_ingreso_o_menu(update: Update, context: ContextTypes.DEFAULT_TYPE
     nombre = USUARIOS_AUTORIZADOS.get(clave)
     if nombre:
         PERFILES[user_id] = PerfilUsuario(nombre=nombre, autenticado=True)
+        KNOWN_USERS.add(user_id)  # <── guardamos el ID para broadcast
         primer_nombre = nombre.split()[0]
         await update.message.reply_text(
             f"¡Hola, {primer_nombre}! 😊\n{BIENVENIDA}".replace("}}", "}"),
@@ -662,9 +617,8 @@ async def text_ingreso_o_menu(update: Update, context: ContextTypes.DEFAULT_TYPE
             reply_markup=bottom_keyboard()
         )
 
-# Acciones comunes reutilizables
+# Acciones comunes
 async def accion_agenda(upd_or_q, context: ContextTypes.DEFAULT_TYPE):
-    # Si aún estamos en pre-lanzamiento, bloquear
     en_pre, msg = esta_en_prelanzamiento()
     if en_pre:
         if isinstance(upd_or_q, Update):
@@ -687,7 +641,7 @@ async def accion_agenda(upd_or_q, context: ContextTypes.DEFAULT_TYPE):
         else:
             await message.reply_text("📅 Agenda del evento (PDF disponible para descargar).")
         await envia_documento(upd_or_q, context, AGENDA_PDF, "Agenda del evento")
-        return  # evitar duplicado
+        return
 
     texto = (
         "📅 *Agenda del evento*\n"
@@ -704,7 +658,6 @@ async def accion_agenda(upd_or_q, context: ContextTypes.DEFAULT_TYPE):
     await message.reply_text("¿Qué deseas hacer ahora?", reply_markup=principal_inline())
 
 async def accion_ubicacion(upd_or_q, context: ContextTypes.DEFAULT_TYPE):
-    # Bloqueo en pre-lanzamiento
     en_pre, msg = esta_en_prelanzamiento()
     if en_pre:
         if isinstance(upd_or_q, Update):
@@ -727,8 +680,27 @@ async def accion_ubicacion(upd_or_q, context: ContextTypes.DEFAULT_TYPE):
     else:
         await message.reply_text(texto, parse_mode="Markdown", reply_markup=ubicacion_inline())
 
+# ---- Estrategia del día
+async def accion_estrategia(upd_or_q, context: ContextTypes.DEFAULT_TYPE):
+    if isinstance(upd_or_q, Update):
+        chat = upd_or_q.effective_chat
+    else:
+        chat = upd_or_q.message.chat
+
+    await chat.send_message(ESTRATEGIA_TEXTO, parse_mode="Markdown")
+
+    if ESTRATEGIA_IMG.exists():
+        try:
+            with ESTRATEGIA_IMG.open("rb") as f:
+                await chat.send_photo(photo=f, caption="Estrategia del día: IBM")
+        except Exception as e:
+            await chat.send_message(f"⚠️ No se pudo adjuntar la imagen de la estrategia. Detalle: {e}")
+    else:
+        await chat.send_message("⚠️ No se encontró la imagen de la estrategia en data/estrategia_ibm.jpg")
+
+    await chat.send_message("¿Qué deseas hacer ahora?", reply_markup=principal_inline())
+
 async def accion_wifi(upd_or_q, context: ContextTypes.DEFAULT_TYPE):
-    # Bloqueo en pre-lanzamiento (por si lo quieres restringir)
     en_pre, msg = esta_en_prelanzamiento()
     if en_pre:
         if isinstance(upd_or_q, Update):
@@ -748,7 +720,6 @@ async def accion_wifi(upd_or_q, context: ContextTypes.DEFAULT_TYPE):
     texto = (
         "📶 *Wi-Fi del evento*\n\n"
         f"• **Nombre de red:** `{WIFI_SSID}`\n\n"
-        #f"• **Clave:** `{WIFI_PASS}`\n\n"
         "_*La red es abierta (no necesita clave) \n\n *Se abre una pestaña, le das en visitantes \n\n *Escoges Estelar easy conection \n\n *Y escribes la palabra Estelar2025_"
     )
     if edit:
@@ -756,11 +727,85 @@ async def accion_wifi(upd_or_q, context: ContextTypes.DEFAULT_TYPE):
     else:
         await message.reply_text(texto, parse_mode="Markdown", reply_markup=wifi_inline())
 
+# =========================
+# ADMIN BROADCAST (NUEVO)
+# =========================
+
+BROADCAST_WAITING = 1
+
+async def broadcast_start_cb(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Entrypoint por botón inline."""
+    query = update.callback_query
+    await query.answer()
+    uid = query.from_user.id
+    if uid not in ADMINS:
+        await query.answer("Solo para administradores.", show_alert=True)
+        return ConversationHandler.END
+
+    await query.edit_message_text(
+        "📣 *Envío masivo*\n\nEnvía ahora el mensaje que deseas reenviar a TODOS "
+        "los usuarios (puede ser texto, foto, video o documento). "
+        "Escribe /cancel para cancelar.",
+        parse_mode="Markdown"
+    )
+    return BROADCAST_WAITING
+
+async def broadcast_start_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Entrypoint por comando /broadcast."""
+    uid = update.effective_user.id
+    if uid not in ADMINS:
+        await update.message.reply_text("🚫 Este comando es solo para administradores.")
+        return ConversationHandler.END
+
+    await update.message.reply_text(
+        "📣 *Envío masivo*\n\nEnvía ahora el mensaje que deseas reenviar a TODOS "
+        "los usuarios (texto, foto, video o documento). "
+        "Escribe /cancel para cancelar.",
+        parse_mode="Markdown"
+    )
+    return BROADCAST_WAITING
+
+async def broadcast_receive(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Copia el mensaje del admin a cada destinatario."""
+    uid = update.effective_user.id
+    if uid not in ADMINS:
+        return ConversationHandler.END
+
+    targets = get_broadcast_targets()
+    if not targets:
+        await update.message.reply_text("⚠️ No hay destinatarios configurados. "
+                                        "Agrega IDs en BROADCAST_IDS o espera a que se autentiquen usuarios.")
+        return ConversationHandler.END
+
+    ok, fail = 0, 0
+    for tid in targets:
+        try:
+            await context.bot.copy_message(
+                chat_id=tid,
+                from_chat_id=update.effective_chat.id,
+                message_id=update.message.message_id
+            )
+            ok += 1
+        except Exception:
+            fail += 1
+        # Pequeña pausa para evitar límites (ajusta si tienes muchos usuarios)
+        await asyncio.sleep(0.05)
+
+    await update.message.reply_text(f"✅ Enviado a {ok} usuarios. ❌ Fallidos: {fail}")
+    return ConversationHandler.END
+
+async def broadcast_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Operación cancelada.")
+    return ConversationHandler.END
+
+# =========================
+# MENÚ CALLBACKS
+# =========================
+
 async def menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
-    # Bloqueo en pre-lanzamiento
     en_pre, msg = esta_en_prelanzamiento()
     if en_pre:
         await query.message.reply_text(msg)
@@ -773,17 +818,14 @@ async def menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     data = query.data
 
-    # Volver al menú principal
     if data == "volver_menu_principal":
         await query.edit_message_text("Menú principal:", reply_markup=principal_inline())
         return
 
-    # ====== AGENDA ======
     if data == "menu_agenda":
         await accion_agenda(query, context)
         return
 
-    # ====== MATERIAL POR PRESENTADOR ======
     if data == "menu_material":
         await query.edit_message_text(
             "📚 *Material de apoyo*\nElige un presentador:",
@@ -814,7 +856,7 @@ async def menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                           parse_mode="Markdown")
         return
 
-    if data.startswith("mat_videos_url:"):  # NUEVO (Drive)
+    if data.startswith("mat_videos_url:"):
         pid = data.split(":", 1)[1]
         enlaces = VIDEO_LINKS.get(pid, {})
         if not enlaces:
@@ -838,7 +880,6 @@ async def menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                           parse_mode="Markdown")
         return
 
-    # ====== ENLACES ======
     if data == "menu_enlaces":
         await query.edit_message_text("🔗 *Enlaces y Conexión*",
                                       reply_markup=enlaces_inline_general(),
@@ -874,12 +915,10 @@ async def menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.edit_message_text("🧩 Conexiones del evento:", reply_markup=InlineKeyboardMarkup(rows))
         return
 
-    # ====== UBICACIÓN ======
     if data == "menu_ubicacion":
         await accion_ubicacion(query, context)
         return
 
-    # ====== EXNESS ======
     if data == "menu_exness":
         texto = (
             "💳 *Apertura de cuenta y Copy Trading*\n\n"
@@ -890,14 +929,15 @@ async def menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(texto, parse_mode="Markdown", reply_markup=exness_inline())
         return
 
-    # ====== WIFI ======
     if data == "menu_wifi":
         await accion_wifi(query, context)
         return
 
-    # ====== Descargas concretas (videos/documentos) ======
+    if data == "menu_estrategia":
+        await accion_estrategia(query, context)
+        return
+
     if data.startswith("video:"):
-        # formato: video:<pid>:<titulo>
         _, pid, titulo = data.split(":", 2)
         ruta = MATERIALES.get(pid, {}).get("videos", {}).get(titulo)
         if ruta:
@@ -907,18 +947,12 @@ async def menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if data.startswith("doc:"):
-        # formato: doc:<pid>:<titulo>
         _, pid, titulo = data.split(":", 2)
         ruta = MATERIALES.get(pid, {}).get("docs", {}).get(titulo)
         if ruta:
             await envia_documento(update, context, ruta, titulo)
         else:
             await query.message.reply_text("No se encontró el documento solicitado.")
-        return
-
-        # ====== ESTRATEGIA DEL DÍA ======
-    if data == "menu_estrategia":
-        await accion_estrategia(query, context)
         return
 
 # =========================
@@ -930,6 +964,21 @@ def build_app() -> Application:
         raise RuntimeError("Falta la variable de entorno BOT_TOKEN.")
 
     app = Application.builder().token(BOT_TOKEN).build()
+
+    # Conversación de broadcast (debe ir ANTES del CallbackQueryHandler general)
+    app.add_handler(ConversationHandler(
+        entry_points=[
+            CallbackQueryHandler(broadcast_start_cb, pattern="^admin_broadcast$"),
+            CommandHandler("broadcast", broadcast_start_cmd),
+        ],
+        states={
+            BROADCAST_WAITING: [
+                MessageHandler(filters.ALL & ~filters.COMMAND, broadcast_receive)
+            ]
+        },
+        fallbacks=[CommandHandler("cancel", broadcast_cancel)],
+        allow_reentry=True,
+    ))
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_cmd))
