@@ -56,13 +56,35 @@ WIFI_PASS = os.getenv("WIFI_PASS", "Contrasena123")
 # --- ADMIN & BROADCAST (NUEVO) ---
 # Pega aquí los IDs de los administradores (números de Telegram)
 ADMINS: set[int] = {
-    7710920544,  # <-- reemplaza por tus IDs
+    7710920544,
+    7560374352, 
+    7837963996, 
+    8465613365,  # <-- reemplaza por tus IDs
     
 }
 
 # Pega aquí, si quieres, los IDs de los destinatarios del broadcast (usuarios)
 # Si lo dejas vacío, el bot usará automáticamente los que se vayan autenticando
-BROADCAST_IDS: set[int] = {6508902216}
+BROADCAST_IDS: set[int] = {6508902216,
+                           847556897,
+                           2139062389,
+                           1408453372,
+                           5089144317,
+                           6700224972,
+                           1990106760,
+                           7096748785,
+                           5324746701,
+                           2081407032,
+                           6925234567,
+                           1359872755,
+                           6792375974,
+                           315236739,
+                           5410977620,
+                           7194474243,
+                           8489105995,
+                           5289018270,
+                           2032721152,
+                           }
 # Colección de usuarios autenticados en esta ejecución (para broadcast si BROADCAST_IDS está vacío)
 KNOWN_USERS: set[int] = set()
 
@@ -773,8 +795,12 @@ async def broadcast_receive(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     targets = get_broadcast_targets()
     if not targets:
-        await update.message.reply_text("⚠️ No hay destinatarios configurados. "
-                                        "Agrega IDs en BROADCAST_IDS o espera a que se autentiquen usuarios.")
+        await update.message.reply_text(
+            "⚠️ No hay destinatarios configurados. "
+            "Agrega IDs en BROADCAST_IDS o espera a que se autentiquen usuarios."
+        )
+        # ← Mostrar menú nuevamente
+        await update.message.reply_text("Menú principal:", reply_markup=principal_inline())
         return ConversationHandler.END
 
     ok, fail = 0, 0
@@ -788,15 +814,20 @@ async def broadcast_receive(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ok += 1
         except Exception:
             fail += 1
-        # Pequeña pausa para evitar límites (ajusta si tienes muchos usuarios)
         await asyncio.sleep(0.05)
 
     await update.message.reply_text(f"✅ Enviado a {ok} usuarios. ❌ Fallidos: {fail}")
+    # ← Mostrar menú nuevamente
+    await update.message.reply_text("Menú principal:", reply_markup=principal_inline())
     return ConversationHandler.END
+
 
 async def broadcast_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Operación cancelada.")
+    # ← Mostrar menú nuevamente
+    await update.message.reply_text("Menú principal:", reply_markup=principal_inline())
     return ConversationHandler.END
+D
 
 # =========================
 # MENÚ CALLBACKS
