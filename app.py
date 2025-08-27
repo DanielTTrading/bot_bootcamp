@@ -319,20 +319,69 @@ EXNESS_COPY_URL = "https://social-trading.exness.com/strategy/227834645/a/s3wj0b
 # ==== Clase de los martes ====
 TUES_CLASS_URL = "https://us06web.zoom.us/j/83517450581?pwd=Ls7JvQWFVWpIQGuWPJrmJyTb0hm5vR.1"
 
+
+# ==== Estrategia del día ====
+ESTRATEGIA_IMG = DATA_DIR / "estrategia_ibm.jpg"
+ESTRATEGIA_TEXTO = (
+    "International Business Machines Corporation (IBM): Nuestro Modelo acaba de activar la compra en: $245.75\n"
+    "Stop Loss (SL): $233.34\n"
+    "Objetivo 1 (TP1): $276.77\n"
+    "Objetivo 2 (TP2): $292.90\n"
+    "Relación Retorno/Riesgo (R/R): 2.42 a primer objetivo\n\n"
+    "El consenso de analistas la tienen en compra fuerte, con un precio objetivo para fin de año de $281.32 (14.32% Upside)... "
+    "y nuestros modelos de valoración nos dan un precio objetivo de $248.49 (Valor justo Fundamental Upside 1.09%)\n\n"
+    "*Le estamos asignando el 3.8% del portafolio. Está configurando un fuerte soporte entre los $242 - $238. "
+    "La compañía ha aumentado dividendos durante los últimos 29 años. Momentum positivo*\n\n"
+    "*Esto es el view del Modelo Táctico en el activo, no constituye recomendación de inversión. "
+    "Nosotros te damos el view, tu tomas la decisión*\n\n"
+    "Saludos,\nEquipo JP Tactical Trading"
+)
+
+
 # =========================
 # MENÚS
 # =========================
 
 def principal_inline() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup([
-        [InlineKeyboardButton("📅 Agenda", callback_data="menu_agenda")],
+        #[InlineKeyboardButton("📅 Agenda", callback_data="menu_agenda")],
         [InlineKeyboardButton("📚 Material de apoyo", callback_data="menu_material")],
         [InlineKeyboardButton("🔗 Enlaces y Conexión", callback_data="menu_enlaces")],
         #[InlineKeyboardButton("📍 Ubicación", callback_data="menu_ubicacion")],
         [InlineKeyboardButton("💳 Exness & Copy", callback_data="menu_exness")],
         #[InlineKeyboardButton("📶 Conectarme a la red", callback_data="menu_wifi")],
-        [InlineKeyboardButton("📆 Clase de Exness", url=TUES_CLASS_URL)], # NUEVO
+        [InlineKeyboardButton("📆 Clase de Exness 7:00 pm", url=TUES_CLASS_URL)], # NUEVO
+        [InlineKeyboardButton("🎯 Estrategia del día", callback_data="menu_estrategia")],
     ])
+
+async def accion_estrategia(upd_or_q, context: ContextTypes.DEFAULT_TYPE):
+    """Muestra la Estrategia del día (texto + imagen)."""
+    # Unifica objetos
+    if isinstance(upd_or_q, Update):
+        chat = upd_or_q.effective_chat
+        message = upd_or_q.effective_message
+        edit = None
+    else:
+        q = upd_or_q
+        chat = q.message.chat
+        message = q.message
+        edit = None  # enviaremos como nuevos mensajes
+
+    # 1) Enviar el texto (con Markdown para negritas/itálicas)
+    await chat.send_message(ESTRATEGIA_TEXTO, parse_mode="Markdown")
+
+    # 2) Enviar la imagen si existe
+    if ESTRATEGIA_IMG.exists():
+        try:
+            with ESTRATEGIA_IMG.open("rb") as f:
+                await chat.send_photo(photo=f, caption="Estrategia del día: IBM")
+        except Exception as e:
+            await chat.send_message(f"⚠️ No se pudo adjuntar la imagen de la estrategia. Detalle: {e}")
+    else:
+        await chat.send_message("⚠️ No se encontró la imagen de la estrategia en data/estrategia_ibm.jpg")
+
+    # 3) Ofrecer volver al menú
+    await chat.send_message("¿Qué deseas hacer ahora?", reply_markup=principal_inline())
 
 def presentadores_keyboard(prefix: str) -> InlineKeyboardMarkup:
     rows = []
@@ -865,6 +914,11 @@ async def menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await envia_documento(update, context, ruta, titulo)
         else:
             await query.message.reply_text("No se encontró el documento solicitado.")
+        return
+
+        # ====== ESTRATEGIA DEL DÍA ======
+    if data == "menu_estrategia":
+        await accion_estrategia(query, context)
         return
 
 # =========================
