@@ -85,6 +85,9 @@ BROADCAST_IDS: set[int] = {6508902216,
                            5289018270,
                            2032721152,
                            5664113284,
+                           6490378478,
+                           8484191541,
+                           1848579707,
                            }
 # Colección de usuarios autenticados en esta ejecución (para broadcast si BROADCAST_IDS está vacío)
 KNOWN_USERS: set[int] = set()
@@ -359,7 +362,7 @@ def principal_inline() -> InlineKeyboardMarkup:
         [InlineKeyboardButton("🔗 Enlaces y Conexión", callback_data="menu_enlaces")],
         [InlineKeyboardButton("💳 Exness & Copy", callback_data="menu_exness")],
         [InlineKeyboardButton("📆 Clase de Exness 7:00 pm", url=TUES_CLASS_URL)],
-        [InlineKeyboardButton("🎯 Estrategia del día", callback_data="menu_estrategia")],
+        #[InlineKeyboardButton("🎯 Estrategia del día", callback_data="menu_estrategia")],
         [InlineKeyboardButton("📣 Enviar mensaje (Admin)", callback_data="admin_broadcast")],  # <── NUEVO
     ])
 
