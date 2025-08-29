@@ -361,7 +361,7 @@ def principal_inline() -> InlineKeyboardMarkup:
         [InlineKeyboardButton("📚 Material de apoyo", callback_data="menu_material")],
         [InlineKeyboardButton("🔗 Enlaces y Conexión", callback_data="menu_enlaces")],
         [InlineKeyboardButton("💳 Exness & Copy", callback_data="menu_exness")],
-        [InlineKeyboardButton("📆 Clase de Exness 7:00 pm", url=TUES_CLASS_URL)],
+        #[InlineKeyboardButton("📆 Clase de Exness 7:00 pm", url=TUES_CLASS_URL)],
         #[InlineKeyboardButton("🎯 Estrategia del día", callback_data="menu_estrategia")],
         [InlineKeyboardButton("📣 Enviar mensaje (Admin)", callback_data="admin_broadcast")],  # <── NUEVO
     ])
