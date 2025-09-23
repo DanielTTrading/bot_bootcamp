@@ -96,6 +96,7 @@ BROADCAST_IDS: set[int] = {6508902216,
                            5879043400,
                            6465238920,
                            1678664428,
+                           5383025330,
                            }
 # Colección de usuarios autenticados en esta ejecución (para broadcast si BROADCAST_IDS está vacío)
 KNOWN_USERS: set[int] = set()
